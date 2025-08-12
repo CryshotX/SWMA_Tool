@@ -177,7 +177,7 @@ units:
       Tactical_Build_Cost_Multiplayer: +25%
       Tactical_Build_Cost_Campaign: +15%
     squadrons:
-      delay_seconds: 8
+      delay_seconds: 2
       starting:
         0:
           - type: Clone_ARC_170_Squadron
@@ -185,19 +185,15 @@ units:
           - type: Clone_Nimbus_V_Wing_Squadron
             count: 2
           - type: NTB_630_Squadron
-            count: 1
+            count: 4
       reserve:
         0:
           - type: Clone_ARC_170_Squadron
-            count: 6
+            count: 10
           - type: Clone_Nimbus_V_Wing_Squadron
-            count: 6
+            count: 10
           - type: NTB_630_Squadron
-            count: 3
-    hardpoints:
-      fire_rate_increase: +50%
-      damage_increase: +100%
-      burst_delay_adjustment: -20%
+            count: 16
 
   Praetor_I_Battlecruiser:
     base_unit: Skirmish_Praetor_I_Battlecruiser
@@ -219,9 +215,9 @@ units:
       reserve:
         0:
           - type: Clone_ARC_170_Squadron
-            count: 8
+            count: 12
           - type: Clone_Nimbus_V_Wing_Squadron
-            count: 8
+            count: 12
           - type: NTB_630_Squadron
             count: 5
 
@@ -229,37 +225,33 @@ units:
     base_unit: Skirmish_Procurator_Battlecruiser
     campaign_unit: Procurator_Battlecruiser
     template_changes:
-      shield_refresh_rate: +35%
+      shield_refresh_rate: +50%
       energy_refresh_rate: +25%
       population_value: 18
     squadrons:
-      delay_seconds: 6
+      delay_seconds: 5
       starting:
         0:
           - type: Clone_ARC_170_Squadron
-            count: 2
+            count: 3
           - type: Clone_Nimbus_V_Wing_Squadron
-            count: 2
-          - type: NTB_630_Squadron
-            count: 1
+            count: 3
       reserve:
         0:
           - type: Clone_ARC_170_Squadron
-            count: 7
+            count: 12
           - type: Clone_Nimbus_V_Wing_Squadron
-            count: 7
-          - type: NTB_630_Squadron
-            count: 4
+            count: 12
     hardpoints:
       fire_rate_increase: +45%
-      damage_increase: +120%
+      damage_increase: +20%
       burst_delay_adjustment: -15%
 
   Acclamator_Destroyer:
     base_unit: Skirmish_Acclamator_Destroyer
     campaign_unit: Acclamator_Destroyer
     template_changes:
-      shield_refresh_rate: +25%
+      shield_refresh_rate: +50%
       energy_refresh_rate: +15%
       population_value: 12
     squadrons:

@@ -2142,7 +2142,7 @@
 		<Starting_Spawned_Units_Tech_2> Clone_BTLB_Y_Wing_Squadron, 1 </Starting_Spawned_Units_Tech_2>
 		<Starting_Spawned_Units_Tech_4> Clone_BTLB_Y_Wing_Squadron, 1 </Starting_Spawned_Units_Tech_4>
 		
-		<Spawned_Squadron_Delay_Seconds> 5 </Spawned_Squadron_Delay_Seconds>
+		<Spawned_Squadron_Delay_Seconds> 15 </Spawned_Squadron_Delay_Seconds>
 		
 		<Reserve_Spawned_Units_Tech_1> Cloakshape_Stock_Squadron, 1 </Reserve_Spawned_Units_Tech_1>
 		<Reserve_Spawned_Units_Tech_2> Clone_Z95_Headhunter_Squadron, 1 </Reserve_Spawned_Units_Tech_2>		<!-- Clone Z95 Flag -->

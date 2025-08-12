@@ -455,7 +455,7 @@ class SWModdingTool:
             self.apply_single_file_squadron_changes(unit_config, squadron_file)
     
     def apply_skirmish_squadron_changes(self, unit_config: Dict[str, Any]):
-        """Wendet Squadron-Änderungen im Skirmish-Modus an mit intelligenter Datei-Auswahl"""
+        """Wendet Squadron-Änderungen im Skirmish-Modus an - sowohl für Skirmish als auch Campaign"""
         if 'squadrons' not in unit_config:
             return
         
@@ -465,18 +465,77 @@ class SWModdingTool:
         campaign_file = str(self.xml_base_dir / "Units/Republic_Space_Units.xml")
         
         if is_template_based:
-            # Template-basierte Units: Geschwader in SkirmishUnits definieren
-            print(f"Template-basierte Unit erkannt - Geschwader werden in SkirmishUnits definiert")
+            # Template-basierte Units: Geschwader in BEIDEN Dateien definieren
+            print(f"Template-basierte Unit erkannt - Geschwader werden in SkirmishUnits UND Republic_Space_Units definiert")
             self.apply_single_file_squadron_changes(unit_config, skirmish_file)
-            # Geschwader aus Campaign-Datei entfernen (falls vorhanden)
-            self.remove_squadron_from_file(unit_config, campaign_file)
-        else:
-            # Campaign-basierte Units: Geschwader in Republic_Space_Units definieren
-            print(f"Campaign-basierte Unit erkannt - Geschwader werden in Republic_Space_Units definiert")
             self.apply_single_file_squadron_changes(unit_config, campaign_file)
-            # Geschwader aus Skirmish-Datei entfernen (falls vorhanden)
-            self.remove_squadron_from_file(unit_config, skirmish_file)
+        else:
+            # Campaign-basierte Units: Geschwader in BEIDEN Dateien definieren
+            print(f"Campaign-basierte Unit erkannt - Geschwader werden in Republic_Space_Units UND SkirmishUnits definiert")
+            self.apply_single_file_squadron_changes(unit_config, campaign_file)
+            self.apply_single_file_squadron_changes(unit_config, skirmish_file)
     
+    def get_original_tech_levels(self, unit_name: str, squadron_file: str) -> List[int]:
+        """Ermittelt die ursprünglichen Tech Level aus der Backup-Datei"""
+        # Backup-Datei finden
+        backup_file = self.find_latest_backup(squadron_file)
+        if not backup_file:
+            print(f"Warnung: Kein Backup gefunden für {squadron_file}, verwende Standard-Tech-Level")
+            if 'Republic_Space_Units.xml' in squadron_file:
+                return [1, 2, 4]  # Standard für Campaign
+            else:
+                return [0]  # Standard für Skirmish
+        
+        try:
+            # Backup-Datei laden
+            backup_tree = self.xml_processor.load_xml(backup_file)
+            backup_unit = self.xml_processor.find_unit_element(backup_tree, unit_name)
+            
+            if not backup_unit:
+                print(f"Warnung: Einheit {unit_name} nicht im Backup gefunden, verwende Standard-Tech-Level")
+                if 'Republic_Space_Units.xml' in squadron_file:
+                    return [1, 2, 4]
+                else:
+                    return [0]
+            
+            # Alle Squadron-Tags im Backup finden
+            tech_levels = set()
+            squadron_tags = [
+                'Starting_Spawned_Units_Tech_0', 'Starting_Spawned_Units_Tech_1',
+                'Starting_Spawned_Units_Tech_2', 'Starting_Spawned_Units_Tech_3',
+                'Starting_Spawned_Units_Tech_4', 'Starting_Spawned_Units_Tech_5',
+                'Reserve_Spawned_Units_Tech_0', 'Reserve_Spawned_Units_Tech_1',
+                'Reserve_Spawned_Units_Tech_2', 'Reserve_Spawned_Units_Tech_3',
+                'Reserve_Spawned_Units_Tech_4', 'Reserve_Spawned_Units_Tech_5'
+            ]
+            
+            for tag_name in squadron_tags:
+                if backup_unit.find(tag_name) is not None:
+                    # Tech Level aus Tag-Namen extrahieren
+                    if 'Tech_' in tag_name:
+                        tech_part = tag_name.split('Tech_')[-1]
+                        try:
+                            tech_level = int(tech_part)
+                            tech_levels.add(tech_level)
+                        except ValueError:
+                            continue
+            
+            if tech_levels:
+                return sorted(list(tech_levels))
+            else:
+                print(f"Warnung: Keine Tech-Level im Backup gefunden für {unit_name}, verwende Standard")
+                if 'Republic_Space_Units.xml' in squadron_file:
+                    return [1, 2, 4]
+                else:
+                    return [0]
+                    
+        except Exception as e:
+            print(f"Warnung: Fehler beim Ermitteln der ursprünglichen Tech-Level: {e}")
+            if 'Republic_Space_Units.xml' in squadron_file:
+                return [1, 2, 4]
+            else:
+                return [0]
+
     def apply_single_file_squadron_changes(self, unit_config: Dict[str, Any], squadron_file: str):
         """Wendet Squadron-Änderungen auf eine einzelne Datei an"""
         if 'squadrons' not in unit_config:
@@ -502,11 +561,18 @@ class SWModdingTool:
         # Bestehende Squadron-Tags entfernen
         self.xml_processor.remove_squadron_tags(unit_element)
         
-        # Neue Squadron-Konfiguration hinzufügen
+        # Ursprüngliche Tech Level aus Backup ermitteln
+        tech_levels = self.get_original_tech_levels(unit_name, squadron_file)
+        print(f"  Verwende ursprüngliche Tech-Level: {tech_levels}")
+        
+        # Neue Squadron-Konfiguration für alle Tech Level hinzufügen
         if 'starting' in squadron_config:
-            for tech_level, squadrons in squadron_config['starting'].items():
+            for tech_level in tech_levels:
+                # Verwende die Squadrons aus dem ersten konfigurierten Tech Level (normalerweise 0)
+                first_tech_level = list(squadron_config['starting'].keys())[0]
+                squadrons = squadron_config['starting'][first_tech_level]
+                
                 for squadron in squadrons:
-                    # Korrekte Tag-Generierung: Starting_Spawned_Units_Tech_0
                     tag_name = f"Starting_Spawned_Units_Tech_{tech_level}"
                     self.xml_processor.add_squadron_tag(
                         unit_element, tag_name, 
@@ -515,9 +581,12 @@ class SWModdingTool:
                     print(f"  {tag_name}: {squadron['type']} x{squadron['count']}")
         
         if 'reserve' in squadron_config:
-            for tech_level, squadrons in squadron_config['reserve'].items():
+            for tech_level in tech_levels:
+                # Verwende die Squadrons aus dem ersten konfigurierten Tech Level (normalerweise 0)
+                first_tech_level = list(squadron_config['reserve'].keys())[0]
+                squadrons = squadron_config['reserve'][first_tech_level]
+                
                 for squadron in squadrons:
-                    # Korrekte Tag-Generierung: Reserve_Spawned_Units_Tech_0
                     tag_name = f"Reserve_Spawned_Units_Tech_{tech_level}"
                     self.xml_processor.add_squadron_tag(
                         unit_element, tag_name, 
@@ -829,7 +898,11 @@ class SWModdingTool:
         
         # XML laden
         tree = self.xml_processor.load_xml(squadron_file)
-        unit_name = unit_config.get('base_unit') or list(unit_config.keys())[0]
+        unit_name = unit_config.get('base_unit') or unit_config.get('campaign_unit') or list(unit_config.keys())[0]
+        
+        # Für Campaign-Datei verwende campaign_unit Namen
+        if 'Republic_Space_Units.xml' in squadron_file:
+            unit_name = unit_config.get('campaign_unit', unit_name)
         
         unit_element = self.xml_processor.find_unit_element(tree, unit_name)
         if not unit_element:
