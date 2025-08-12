@@ -1,0 +1,445 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "SWMA Tool Konfiguration",
+  "description": "Schema für die SWMA Tool YAML-Konfigurationsdatei",
+  "type": "object",
+  "properties": {
+    "game_mode": {
+      "type": "string",
+      "enum": ["skirmish", "campaign"],
+      "description": "Spielmodus für die Modifikationen",
+      "default": "skirmish"
+    },
+    "units": {
+      "type": "object",
+      "description": "Konfiguration für alle Einheiten",
+      "patternProperties": {
+        "^.*$": {
+          "type": "object",
+          "properties": {
+            "template": {
+              "type": "string",
+              "description": "Name des Template-Elements in der XML-Datei (optional für Units ohne Template)"
+            },
+            "base_unit": {
+              "type": "string",
+              "description": "Name der Skirmish-Unit in SkirmishUnits_Republic.xml"
+            },
+            "campaign_unit": {
+              "type": "string",
+              "description": "Name der Campaign-Unit in Republic_Space_Units.xml"
+            },
+            "template_changes": {
+              "type": "object",
+              "description": "Änderungen an Template-Eigenschaften",
+              "properties": {
+                "shield_points": {
+                  "type": "string",
+                  "pattern": "^[+-]?\\d+%?$",
+                  "description": "Schildpunkte (z.B. +10%, -5%, 1000)"
+                },
+                "shield_refresh_rate": {
+                  "type": "string",
+                  "pattern": "^[+-]?\\d+%?$",
+                  "description": "Schild-Regenerationsrate (z.B. +50%, -10%, 100)"
+                },
+                "energy_refresh_rate": {
+                  "type": "string",
+                  "pattern": "^[+-]?\\d+%?$",
+                  "description": "Energie-Regenerationsrate (z.B. +20%, -5%, 50)"
+                },
+                "tactical_health": {
+                  "type": "string",
+                  "pattern": "^[+-]?\\d+%?$",
+                  "description": "Taktische Hüllenpunkte (z.B. +15%, -10%, 2000)"
+                },
+                "population_value": {
+                  "type": "integer",
+                  "description": "Bevölkerungswert der Einheit"
+                }
+              },
+              "additionalProperties": true
+            },
+            "cost_changes": {
+              "type": "object",
+              "description": "Änderungen an Kaufpreisen (nur für Skirmish)",
+              "properties": {
+                "Tactical_Build_Cost_Multiplayer": {
+                  "oneOf": [
+                    {
+                      "type": "string",
+                      "pattern": "^[+-]?\\d+%?$",
+                      "description": "Kaufpreis für Multiplayer/Skirmish (z.B. +25%, -10%, 5000)"
+                    },
+                    {
+                      "type": "integer",
+                      "description": "Fester Kaufpreis für Multiplayer/Skirmish"
+                    }
+                  ]
+                },
+                "Tactical_Build_Cost_Campaign": {
+                  "oneOf": [
+                    {
+                      "type": "string",
+                      "pattern": "^[+-]?\\d+%?$",
+                      "description": "Kaufpreis für Campaign (z.B. +25%, -10%, 5000)"
+                    },
+                    {
+                      "type": "integer",
+                      "description": "Fester Kaufpreis für Campaign"
+                    }
+                  ]
+                },
+                "Build_Cost_Credits": {
+                  "oneOf": [
+                    {
+                      "type": "string",
+                      "pattern": "^[+-]?\\d+%?$",
+                      "description": "Allgemeiner Kaufpreis (z.B. +25%, -10%, 5000)"
+                    },
+                    {
+                      "type": "integer",
+                      "description": "Fester allgemeiner Kaufpreis"
+                    }
+                  ]
+                },
+                "Maintenance_Cost": {
+                  "oneOf": [
+                    {
+                      "type": "string",
+                      "pattern": "^[+-]?\\d+%?$",
+                      "description": "Wartungskosten (z.B. +25%, -10%, 100)"
+                    },
+                    {
+                      "type": "integer",
+                      "description": "Feste Wartungskosten"
+                    }
+                  ]
+                }
+              },
+              "additionalProperties": true
+            },
+            "squadrons": {
+              "type": "object",
+              "description": "Geschwader-Konfiguration",
+              "properties": {
+                "delay_seconds": {
+                  "type": "number",
+                  "description": "Verzögerung in Sekunden vor dem Spawnen von Geschwadern"
+                },
+                "starting": {
+                  "type": "object",
+                  "description": "Geschwader die beim Start verfügbar sind",
+                  "patternProperties": {
+                    "^[0-5]$": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "type": {
+                            "type": "string",
+                            "enum": [
+                              "Clone_ARC_170_Squadron",
+                              "Clone_ARC_170_Squadron_Double",
+                              "Clone_ARC_170_Squadron_Half",
+                              "Clone_Nimbus_V_Wing_Squadron",
+                              "Clone_BTLB_Y_Wing_Squadron",
+                              "Clone_BTLB_Y_Wing_Squadron_Double",
+                              "Clone_BTLB_Y_Wing_Squadron_Half",
+                              "Torrent_Squadron",
+                              "NTB_630_Squadron",
+                              "Delta7_Squadron_Double",
+                              "BTLS1_Y_Wing_Squadron",
+                              "BTLS1_Y_Wing_Squadron_Double",
+                              "BTLS1_Y_Wing_Squadron_Half",
+                              "TIE_Fighter_Squadron",
+                              "TIE_Fighter_Squadron_Double",
+                              "TIE_Fighter_Squadron_Half",
+                              "TIE_Fighter_Squadron_Third",
+                              "TIE_Bomber_Squadron",
+                              "TIE_Bomber_Squadron_Double",
+                              "TIE_Bomber_Squadron_Half",
+                              "TIE_Starfighter_Squadron",
+                              "TIE_Starfighter_Squadron_Double",
+                              "TIE_Starfighter_Squadron_Half",
+                              "TIE_Pod_Squadron",
+                              "TIE_Pod_Squadron_Double",
+                              "TIE_Pod_Squadron_Half",
+                              "Missile_TIE_Squadron",
+                              "ARC_170_Squadron",
+                              "ARC_170_Squadron_Double",
+                              "ARC_170_Squadron_Half",
+                              "Nimbus_V_Wing_Squadron",
+                              "Nimbus_V_Wing_Squadron_Double",
+                              "Nimbus_V_Wing_Squadron_Half",
+                              "Y_Wing_Squadron",
+                              "Y_Wing_Squadron_Double",
+                              "Y_Wing_Squadron_Half",
+                              "BTLB_Y_Wing_Squadron",
+                              "BTLB_Y_Wing_Squadron_Double",
+                              "BTLB_Y_Wing_Squadron_Half",
+                              "Z95_Headhunter_Squadron",
+                              "Z95_Headhunter_Squadron_Double",
+                              "Z95_Headhunter_Squadron_Half",
+                              "Z95XT_Headhunter_Squadron",
+                              "Z95XT_Headhunter_Squadron_Double",
+                              "Z95XT_Headhunter_Squadron_Half",
+                              "Z95ML_Headhunter_Squadron",
+                              "Z95ML_Headhunter_Squadron_Double",
+                              "Z95ML_Headhunter_Squadron_Half",
+                              "Z95_Bomber_Squadron",
+                              "Z95_Bomber_Squadron_Double",
+                              "Z95_Bomber_Squadron_Half",
+                              "Skipray_Squadron",
+                              "Skipray_Squadron_Double",
+                              "Skipray_Squadron_Half",
+                              "Early_Skipray_Squadron",
+                              "Early_Skipray_Squadron_Double",
+                              "Early_Skipray_Squadron_Half",
+                              "Mankvim_Squadron",
+                              "Mankvim_Squadron_Double",
+                              "Mankvim_Squadron_Half",
+                              "Aggressor_Assault_Fighter_Squadron",
+                              "Aggressor_Assault_Fighter_Squadron_Double",
+                              "Aggressor_Assault_Fighter_Squadron_Half",
+                              "2_Warpod_Squadron",
+                              "2_Warpod_Squadron_Double",
+                              "2_Warpod_Squadron_Half",
+                              "N1_Squadron",
+                              "N1_Squadron_Skirmish",
+                              "N1_Squadron_Double",
+                              "N1_Squadron_Half",
+                              "G1_Squadron",
+                              "G1_Squadron_Double",
+                              "G1_Squadron_Half",
+                              "I_BEAM_Squadron",
+                              "I_BEAM_Squadron_Double",
+                              "I_BEAM_Squadron_Half",
+                              "Cloakshape_Stock_Squadron",
+                              "Cloakshape_Stock_Squadron_Double",
+                              "Cloakshape_Stock_Squadron_Half",
+                              "Cloakshape_Squadron",
+                              "Cloakshape_Squadron_Double",
+                              "Cloakshape_Squadron_Half",
+                              "Cloakshape_New_Squadron",
+                              "Cloakshape_New_Squadron_Double",
+                              "Cloakshape_New_Squadron_Half",
+                              "Toscan_Stock_Squadron",
+                              "Toscan_Stock_Squadron_Double",
+                              "Toscan_Stock_Squadron_Half",
+                              "Toscan_Missile_Squadron",
+                              "Toscan_Missile_Squadron_Double",
+                              "Toscan_Missile_Squadron_Half",
+                              "Toscan_Gunship_Squadron",
+                              "Toscan_Gunship_Squadron_Double",
+                              "Toscan_Gunship_Squadron_Half",
+                              "Toscan_Interceptor_Squadron",
+                              "Toscan_Interceptor_Squadron_Double",
+                              "Toscan_Interceptor_Squadron_Half",
+                              "Toscan_Bomber_Squadron",
+                              "Toscan_Bomber_Squadron_Double",
+                              "Toscan_Bomber_Squadron_Half",
+                              "Firespray_Squadron",
+                              "Firespray_Squadron_Double",
+                              "Firespray_Squadron_Half",
+                              "Firespray_Gunship_Squadron",
+                              "Firespray_Gunship_Squadron_Double",
+                              "Firespray_Gunship_Squadron_Half",
+                              "Firespray_Bomber_Squadron",
+                              "Firespray_Bomber_Squadron_Double",
+                              "Firespray_Bomber_Squadron_Half",
+                              "R22_Spearhead_Squadron",
+                              "R22_Spearhead_Squadron_Double",
+                              "PDF_Z95_Headhunter_Squadron",
+                              "H60_Tempest_Squadron",
+                              "Gozanti_Cruiser_Squadron",
+                              "Citadel_Cruiser_Squadron"
+                            ],
+                            "description": "Geschwader-Typ (z.B. Clone_ARC_170_Squadron, TIE_Fighter_Squadron)"
+                          },
+                          "count": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "description": "Anzahl der Geschwader"
+                          }
+                        },
+                        "required": ["type", "count"]
+                      }
+                    }
+                  }
+                },
+                "reserve": {
+                  "type": "object",
+                  "description": "Reserve-Geschwader die nachgeordert werden können",
+                  "patternProperties": {
+                    "^[0-5]$": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "type": {
+                            "type": "string",
+                            "enum": [
+                              "Clone_ARC_170_Squadron",
+                              "Clone_ARC_170_Squadron_Double",
+                              "Clone_ARC_170_Squadron_Half",
+                              "Clone_Nimbus_V_Wing_Squadron",
+                              "Clone_BTLB_Y_Wing_Squadron",
+                              "Clone_BTLB_Y_Wing_Squadron_Double",
+                              "Clone_BTLB_Y_Wing_Squadron_Half",
+                              "Torrent_Squadron",
+                              "NTB_630_Squadron",
+                              "Delta7_Squadron_Double",
+                              "BTLS1_Y_Wing_Squadron",
+                              "BTLS1_Y_Wing_Squadron_Double",
+                              "BTLS1_Y_Wing_Squadron_Half",
+                              "TIE_Fighter_Squadron",
+                              "TIE_Fighter_Squadron_Double",
+                              "TIE_Fighter_Squadron_Half",
+                              "TIE_Fighter_Squadron_Third",
+                              "TIE_Bomber_Squadron",
+                              "TIE_Bomber_Squadron_Double",
+                              "TIE_Bomber_Squadron_Half",
+                              "TIE_Starfighter_Squadron",
+                              "TIE_Starfighter_Squadron_Double",
+                              "TIE_Starfighter_Squadron_Half",
+                              "TIE_Pod_Squadron",
+                              "TIE_Pod_Squadron_Double",
+                              "TIE_Pod_Squadron_Half",
+                              "Missile_TIE_Squadron",
+                              "ARC_170_Squadron",
+                              "ARC_170_Squadron_Double",
+                              "ARC_170_Squadron_Half",
+                              "Nimbus_V_Wing_Squadron",
+                              "Nimbus_V_Wing_Squadron_Double",
+                              "Nimbus_V_Wing_Squadron_Half",
+                              "Y_Wing_Squadron",
+                              "Y_Wing_Squadron_Double",
+                              "Y_Wing_Squadron_Half",
+                              "BTLB_Y_Wing_Squadron",
+                              "BTLB_Y_Wing_Squadron_Double",
+                              "BTLB_Y_Wing_Squadron_Half",
+                              "Z95_Headhunter_Squadron",
+                              "Z95_Headhunter_Squadron_Double",
+                              "Z95_Headhunter_Squadron_Half",
+                              "Z95XT_Headhunter_Squadron",
+                              "Z95XT_Headhunter_Squadron_Double",
+                              "Z95XT_Headhunter_Squadron_Half",
+                              "Z95ML_Headhunter_Squadron",
+                              "Z95ML_Headhunter_Squadron_Double",
+                              "Z95ML_Headhunter_Squadron_Half",
+                              "Z95_Bomber_Squadron",
+                              "Z95_Bomber_Squadron_Double",
+                              "Z95_Bomber_Squadron_Half",
+                              "Skipray_Squadron",
+                              "Skipray_Squadron_Double",
+                              "Skipray_Squadron_Half",
+                              "Early_Skipray_Squadron",
+                              "Early_Skipray_Squadron_Double",
+                              "Early_Skipray_Squadron_Half",
+                              "Mankvim_Squadron",
+                              "Mankvim_Squadron_Double",
+                              "Mankvim_Squadron_Half",
+                              "Aggressor_Assault_Fighter_Squadron",
+                              "Aggressor_Assault_Fighter_Squadron_Double",
+                              "Aggressor_Assault_Fighter_Squadron_Half",
+                              "2_Warpod_Squadron",
+                              "2_Warpod_Squadron_Double",
+                              "2_Warpod_Squadron_Half",
+                              "N1_Squadron",
+                              "N1_Squadron_Skirmish",
+                              "N1_Squadron_Double",
+                              "N1_Squadron_Half",
+                              "G1_Squadron",
+                              "G1_Squadron_Double",
+                              "G1_Squadron_Half",
+                              "I_BEAM_Squadron",
+                              "I_BEAM_Squadron_Double",
+                              "I_BEAM_Squadron_Half",
+                              "Cloakshape_Stock_Squadron",
+                              "Cloakshape_Stock_Squadron_Double",
+                              "Cloakshape_Stock_Squadron_Half",
+                              "Cloakshape_Squadron",
+                              "Cloakshape_Squadron_Double",
+                              "Cloakshape_Squadron_Half",
+                              "Cloakshape_New_Squadron",
+                              "Cloakshape_New_Squadron_Double",
+                              "Cloakshape_New_Squadron_Half",
+                              "Toscan_Stock_Squadron",
+                              "Toscan_Stock_Squadron_Double",
+                              "Toscan_Stock_Squadron_Half",
+                              "Toscan_Missile_Squadron",
+                              "Toscan_Missile_Squadron_Double",
+                              "Toscan_Missile_Squadron_Half",
+                              "Toscan_Gunship_Squadron",
+                              "Toscan_Gunship_Squadron_Double",
+                              "Toscan_Gunship_Squadron_Half",
+                              "Toscan_Interceptor_Squadron",
+                              "Toscan_Interceptor_Squadron_Double",
+                              "Toscan_Interceptor_Squadron_Half",
+                              "Toscan_Bomber_Squadron",
+                              "Toscan_Bomber_Squadron_Double",
+                              "Toscan_Bomber_Squadron_Half",
+                              "Firespray_Squadron",
+                              "Firespray_Squadron_Double",
+                              "Firespray_Squadron_Half",
+                              "Firespray_Gunship_Squadron",
+                              "Firespray_Gunship_Squadron_Double",
+                              "Firespray_Gunship_Squadron_Half",
+                              "Firespray_Bomber_Squadron",
+                              "Firespray_Bomber_Squadron_Double",
+                              "Firespray_Bomber_Squadron_Half",
+                              "R22_Spearhead_Squadron",
+                              "R22_Spearhead_Squadron_Double",
+                              "PDF_Z95_Headhunter_Squadron",
+                              "H60_Tempest_Squadron",
+                              "Gozanti_Cruiser_Squadron",
+                              "Citadel_Cruiser_Squadron"
+                            ],
+                            "description": "Geschwader-Typ (z.B. Clone_ARC_170_Squadron, TIE_Fighter_Squadron)"
+                          },
+                          "count": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "description": "Anzahl der Geschwader"
+                          }
+                        },
+                        "required": ["type", "count"]
+                      }
+                    }
+                  }
+                }
+              },
+              "additionalProperties": false
+            },
+            "hardpoints": {
+              "type": "object",
+              "description": "Hardpoint-Modifikationen für Waffen",
+              "properties": {
+                "fire_rate_increase": {
+                  "type": "string",
+                  "pattern": "^[+-]?\\d+%$",
+                  "description": "Feuerratenerhöhung - reduziert Zeit zwischen Salven (z.B. +100% für doppelte Feuerrate)"
+                },
+                "damage_increase": {
+                  "type": "string",
+                  "pattern": "^[+-]?\\d+%$",
+                  "description": "Schadenserhöhung durch mehr Schüsse pro Salve (z.B. +100% für doppelte Fire_Pulse_Count)"
+                },
+                "burst_delay_adjustment": {
+                  "type": "string",
+                  "pattern": "^[+-]?\\d+%$",
+                  "description": "Verzögerung zwischen Schüssen in einer Salve (z.B. -25% für schnellere Schüsse, +50% für langsamere)"
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "required": ["base_unit", "campaign_unit"],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "required": ["game_mode", "units"]
+}

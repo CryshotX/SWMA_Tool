@@ -1,0 +1,25 @@
+{
+    "yaml.schemas": {
+        "./shipchanges.schema.json": [
+            "shipchanges.yaml",
+            "*.yaml"
+        ]
+    },
+    "yaml.validate": true,
+    "yaml.format.enable": true,
+    "yaml.hover": true,
+    "yaml.completion": true,
+    "yaml.suggest": true,
+    "yaml.customTags": [
+        "!reference sequence"
+    ],
+    "files.associations": {
+        "*.yaml": "yaml",
+        "*.yml": "yaml"
+    },
+    "editor.quickSuggestions": {
+        "other": true,
+        "comments": false,
+        "strings": true
+    }
+}

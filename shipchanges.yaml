@@ -1,0 +1,278 @@
+# cursor: disable
+# yaml-language-server: $schema=./shipchanges.schema.json
+
+# SWMA Tool Konfiguration
+game_mode: skirmish
+
+units:
+
+  Acclamator_I_Carrier:
+    template: Template_Acclamator_I_Carrier
+    base_unit: Skirmish_Acclamator_I_Carrier
+    campaign_unit: Acclamator_I_Carrier
+    template_changes:
+      shield_points: +20%
+      shield_refresh_rate: +20%
+      population_value: 10
+    squadrons:
+      delay_seconds: 5
+      
+      starting:
+        0:
+          - type: Clone_ARC_170_Squadron
+            count: 1
+          - type: NTB_630_Squadron
+            count: 1
+      reserve:
+        0:
+          - type: Clone_ARC_170_Squadron
+            count: 4
+          - type:  NTB_630_Squadron
+            count: 4
+
+  Acclamator_II:
+    template: Template_Acclamator_II
+    base_unit: Skirmish_Acclamator_II
+    campaign_unit: Acclamator_II
+    template_changes:
+      shield_points: +10%
+      energy_refresh_rate: +20%
+      population_value: 10
+    hardpoints:
+      damage_increase: +20%
+
+  Venator:
+    template: Template_Venator_Star_Destroyer
+    base_unit: Skirmish_Venator_Star_Destroyer
+    campaign_unit: Venator_Star_Destroyer
+    template_changes:
+      shield_refresh_rate: +50%
+      population_value: 10
+    squadrons:
+      delay_seconds: 1
+      starting:
+        0:
+          - type: Clone_ARC_170_Squadron
+            count: 2
+          - type: Clone_Nimbus_V_Wing_Squadron
+            count: 2
+          - type: NTB_630_Squadron
+            count: 2
+      reserve:
+        0:
+          - type: Clone_ARC_170_Squadron
+            count: 8
+          - type: Clone_Nimbus_V_Wing_Squadron
+            count: 8
+          - type: NTB_630_Squadron
+            count: 8
+
+  Tector_Star_Destroyer:
+    template: Template_Tector_Star_Destroyer
+    base_unit: Skirmish_Tector_Star_Destroyer
+    campaign_unit: Tector_Star_Destroyer
+    hardpoints:
+      fire_rate_increase: +40%
+      damage_increase: +300%
+      burst_delay_adjustment: -50%
+    template_changes:
+      shield_refresh_rate: +100%
+      shield_points: -20%
+      population_value: 10
+      energy_refresh_rate: +100%
+    cost_changes:
+      Tactical_Build_Cost_Multiplayer: +60%
+    squadrons:
+      delay_seconds: 10
+      starting:
+        0:
+          - type: Clone_ARC_170_Squadron
+            count: 1
+      reserve:
+        0:
+          - type: Clone_ARC_170_Squadron
+            count: 3
+
+  Imperial_Star_Destroyer:
+    template: Template_Imperator_Star_Destroyer
+    base_unit: Skirmish_Imperator_Star_Destroyer
+    campaign_unit: Imperator_Star_Destroyer
+    template_changes:
+      population_value: 10
+    squadrons:
+      delay_seconds: 4
+      starting:
+        0:
+          - type: Clone_ARC_170_Squadron
+            count: 2
+          - type: Clone_Nimbus_V_Wing_Squadron
+            count: 3
+      reserve:
+        0:
+          - type: Clone_ARC_170_Squadron
+            count: 6
+          - type: Clone_Nimbus_V_Wing_Squadron
+            count: 9
+
+  Victory_I:
+    template: Template_Victory_I_Star_Destroyer
+    base_unit: Skirmish_Victory_I_Star_Destroyer
+    campaign_unit: Victory_I_Star_Destroyer
+    hardpoints:
+      fire_rate_increase: +30%
+      burst_delay_adjustment: -30%
+    template_changes:
+      population_value: 10
+      shield_points: +30%
+      shield_refresh_rate: +30%
+    squadrons:
+      delay_seconds: 15
+      starting:
+        0:
+          - type: Clone_ARC_170_Squadron
+            count: 1
+      reserve:
+        0:
+          - type: Clone_ARC_170_Squadron
+            count: 3
+
+  Secutor:
+    template: Template_Secutor_Star_Destroyer
+    base_unit: Skirmish_Secutor_Star_Destroyer
+    campaign_unit: Secutor_Star_Destroyer
+    template_changes:
+      shield_refresh_rate: +200%
+      energy_refresh_rate: +100%
+      population_value: 10
+    squadrons:
+      delay_seconds: 2
+      starting:
+        0:
+          - type: Clone_ARC_170_Squadron
+            count: 4
+          - type: Clone_Nimbus_V_Wing_Squadron
+            count: 4
+          - type: NTB_630_Squadron
+            count: 2
+      reserve:
+        0:
+          - type: Clone_ARC_170_Squadron
+            count: 24
+          - type: Clone_Nimbus_V_Wing_Squadron
+            count: 24
+          - type: NTB_630_Squadron
+            count: 16
+    hardpoints:
+      damage_increase: +30%
+  
+  Maelstrom_Battlecruiser:
+    template: Template_Maelstrom_Battlecruiser
+    base_unit: Skirmish_Maelstrom_Battlecruiser
+    campaign_unit: Maelstrom_Battlecruiser
+    template_changes:
+      shield_refresh_rate: +30%
+      energy_refresh_rate: +20%
+      population_value: 15
+    cost_changes:
+      Tactical_Build_Cost_Multiplayer: +25%
+      Tactical_Build_Cost_Campaign: +15%
+    squadrons:
+      delay_seconds: 8
+      starting:
+        0:
+          - type: Clone_ARC_170_Squadron
+            count: 2
+          - type: Clone_Nimbus_V_Wing_Squadron
+            count: 2
+          - type: NTB_630_Squadron
+            count: 1
+      reserve:
+        0:
+          - type: Clone_ARC_170_Squadron
+            count: 6
+          - type: Clone_Nimbus_V_Wing_Squadron
+            count: 6
+          - type: NTB_630_Squadron
+            count: 3
+    hardpoints:
+      fire_rate_increase: +50%
+      damage_increase: +100%
+      burst_delay_adjustment: -20%
+
+  Praetor_I_Battlecruiser:
+    base_unit: Skirmish_Praetor_I_Battlecruiser
+    campaign_unit: Praetor_I_Battlecruiser
+    template_changes:
+      shield_refresh_rate: +50%
+      energy_refresh_rate: +30%
+      population_value: 20
+    squadrons:
+      delay_seconds: 5
+      starting:
+        0:
+          - type: Clone_ARC_170_Squadron
+            count: 3
+          - type: Clone_Nimbus_V_Wing_Squadron
+            count: 3
+          - type: NTB_630_Squadron
+            count: 2
+      reserve:
+        0:
+          - type: Clone_ARC_170_Squadron
+            count: 8
+          - type: Clone_Nimbus_V_Wing_Squadron
+            count: 8
+          - type: NTB_630_Squadron
+            count: 5
+
+  Procurator_Battlecruiser:
+    base_unit: Skirmish_Procurator_Battlecruiser
+    campaign_unit: Procurator_Battlecruiser
+    template_changes:
+      shield_refresh_rate: +35%
+      energy_refresh_rate: +25%
+      population_value: 18
+    squadrons:
+      delay_seconds: 6
+      starting:
+        0:
+          - type: Clone_ARC_170_Squadron
+            count: 2
+          - type: Clone_Nimbus_V_Wing_Squadron
+            count: 2
+          - type: NTB_630_Squadron
+            count: 1
+      reserve:
+        0:
+          - type: Clone_ARC_170_Squadron
+            count: 7
+          - type: Clone_Nimbus_V_Wing_Squadron
+            count: 7
+          - type: NTB_630_Squadron
+            count: 4
+    hardpoints:
+      fire_rate_increase: +45%
+      damage_increase: +120%
+      burst_delay_adjustment: -15%
+
+  Acclamator_Destroyer:
+    base_unit: Skirmish_Acclamator_Destroyer
+    campaign_unit: Acclamator_Destroyer
+    template_changes:
+      shield_refresh_rate: +25%
+      energy_refresh_rate: +15%
+      population_value: 12
+    squadrons:
+      delay_seconds: 4
+      starting:
+        0:
+          - type: Clone_ARC_170_Squadron
+            count: 1
+          - type: Clone_Nimbus_V_Wing_Squadron
+            count: 1
+      reserve:
+        0:
+          - type: Clone_ARC_170_Squadron
+            count: 4
+          - type: Clone_Nimbus_V_Wing_Squadron
+            count: 4

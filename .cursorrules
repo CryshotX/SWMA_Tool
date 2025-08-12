@@ -1,0 +1,463 @@
+# SWMA Tool - Cursor Rules
+
+# Star Wars Modding Assistant - Vollständige Entwicklungsrichtlinien
+
+## 🎯 Projektübersicht
+
+Das SWMA Tool ist ein Python-basiertes Tool zur automatischen Modifikation von Star Wars Empire at War XML-Dateien. Es implementiert intelligente Backup-Verwaltung, Hardpoint-Modifikationen und Geschwader-Konfiguration.
+
+## 🔧 Technische Grundlagen
+
+### 📁 Datei-Struktur
+
+```
+XML/
+├── Units/
+│   ├── Templates_Frigates.xml          # Template-Definitionen für Fregatten
+│   ├── Templates_Capitals.xml          # Template-Definitionen für Großkampfschiffe
+│   ├── Republic_Space_Units.xml        # Campaign-Einheiten
+│   └── Skirmish/
+│       └── SkirmishUnits_Republic.xml  # Skirmish-Einheiten
+├── Hardpoints/
+│   ├── HardPoints_Coresaga_Frigates.xml # Waffen-Hardpoints für Fregatten
+│   └── HardPoints_Coresaga_Capitals.xml # Waffen-Hardpoints für Großkampfschiffe
+└── backups/                            # Automatische Backups
+```
+
+### 🔄 Vererbungshierarchie
+
+Das Spiel verwendet eine **3-stufige Vererbungshierarchie**:
+
+1. **Templates** (`Templates_*.xml`) - Basis-Definitionen
+2. **Campaign Units** (`Republic_Space_Units.xml`) - Erben von Templates
+3. **Skirmish Units** (`SkirmishUnits_Republic.xml`) - Erben von Campaign Units
+
+**WICHTIG**: Vererbung ist **additiv** - Werte werden addiert, nicht überschrieben!
+
+## 🛡️ Automatische Backup-Wiederherstellung
+
+### 🔍 Funktionsweise
+
+Das Tool implementiert eine **robuste Backup-Strategie**:
+
+1. **Erste Ausführung**: Automatische Backups aller relevanten Dateien
+2. **Jede weitere Ausführung**: Wiederherstellung von Original-Backups vor Änderungen
+3. **Sicherheit**: Verhindert kumulative Änderungen
+
+### 📦 Backup-Dateien
+
+```
+backups/
+├── Templates_Frigates_YYYYMMDD_HHMMSS.xml
+├── Templates_Capitals_YYYYMMDD_HHMMSS.xml
+├── Republic_Space_Units_YYYYMMDD_HHMMSS.xml
+├── SkirmishUnits_Republic_YYYYMMDD_HHMMSS.xml
+├── HardPoints_Coresaga_Frigates_YYYYMMDD_HHMMSS.xml
+└── HardPoints_Coresaga_Capitals_YYYYMMDD_HHMMSS.xml
+```
+
+### ✅ Vorteile
+
+- **Konsistenz**: Immer von echten Originalwerten ausgehend
+- **Sicherheit**: Keine kumulativen Änderungen
+- **Zuverlässigkeit**: Automatische Verwaltung
+- **Rückgängig**: Einfache Wiederherstellung
+
+## 🔫 Hardpoint-Mechaniken
+
+### ⚡ Schadensoutput-Kontrolle
+
+**WICHTIG**: Das `<Damage>` Tag ist **nur für Auto-Resolve** relevant!
+
+### 🎯 Echte Kampfschäden
+
+Tatsächliche Kampfschäden werden durch **Hardpoint-Parameter** kontrolliert:
+
+#### 1. **Fire Rate Increase** (`fire_rate_increase`)
+
+- **Parameter**: `Fire_Min_Recharge_Seconds`, `Fire_Max_Recharge_Seconds`
+- **Effekt**: Reduziert Zeit zwischen Salven
+- **Formel**: `neuer_wert = alter_wert / (1 + prozent / 100)`
+- **Beispiel**: `+100%` = doppelte Feuerrate
+
+#### 2. **Damage Increase** (`damage_increase`)
+
+- **Parameter**: `Fire_Pulse_Count`
+- **Effekt**: Mehr Schüsse pro Salve
+- **Formel**: `neuer_wert = max(alter_wert + 1, int(alter_wert * (1 + prozent / 100)))`
+- **Beispiel**: `+100%` = doppelte Schüsse pro Salve
+
+#### 3. **Burst Delay Adjustment** (`burst_delay_adjustment`)
+
+- **Parameter**: `Fire_Pulse_Delay_Seconds`
+- **Effekt**: Kontrolliert Verzögerung zwischen Schüssen in einer Salve
+- **Formel**: `neuer_wert = alter_wert * (1 + prozent / 100)`
+- **Minimum**: 0.05 Sekunden
+- **Beispiel**: `-25%` = schnellere Schüsse, `+50%` = langsamere Schüsse
+
+### 📊 Hardpoint-Parameter Übersicht
+
+| Parameter          | XML-Tag                     | Beschreibung                  | Standard  |
+| ------------------ | --------------------------- | ----------------------------- | --------- |
+| Salven-Zeit        | `Fire_Min_Recharge_Seconds` | Minimale Zeit zwischen Salven | 1.0-20.0s |
+| Salven-Zeit        | `Fire_Max_Recharge_Seconds` | Maximale Zeit zwischen Salven | 1.0-20.0s |
+| Schüsse pro Salve  | `Fire_Pulse_Count`          | Anzahl Schüsse pro Salve      | 2-6       |
+| Schuss-Verzögerung | `Fire_Pulse_Delay_Seconds`  | Zeit zwischen Schüssen        | 0.05-0.5s |
+
+## ✈️ Geschwader-Platzierung
+
+### 🧠 Intelligente Logik
+
+Das Tool erkennt automatisch, ob eine Skirmish-Unit direkt von einem Template erbt:
+
+#### **Template-basierte Units**
+
+- **Erkennung**: `Variant_Of_Existing_Type` beginnt mit `Template_`
+- **Platzierung**: Geschwader in `SkirmishUnits_Republic.xml`
+- **Beispiel**: `Venator` → Template-basiert
+
+#### **Campaign-basierte Units**
+
+- **Erkennung**: `Variant_Of_Existing_Type` verweist auf Campaign-Unit
+- **Platzierung**: Geschwader in `Republic_Space_Units.xml`
+- **Beispiel**: `Acclamator_II` → Campaign-basiert
+
+### 🚫 Doppelte Geschwader-Verhinderung
+
+Das Tool entfernt automatisch Geschwader-Tags aus der anderen Datei:
+
+- Template-basiert → Entfernt aus Campaign-Datei
+- Campaign-basiert → Entfernt aus Skirmish-Datei
+
+### 📋 Geschwader-Tags
+
+```xml
+<Spawned_Squadron_Delay_Seconds>0.0</Spawned_Squadron_Delay_Seconds>
+<Starting_Spawned_Units_Tech_0>Clone_Arc_170_Squadron, 2</Starting_Spawned_Units_Tech_0>
+<Reserve_Spawned_Units_Tech_0>Clone_Arc_170_Squadron, 4</Reserve_Spawned_Units_Tech_0>
+```
+
+## ⚙️ Konfiguration (YAML)
+
+### 📝 Grundstruktur
+
+```yaml
+game_mode: skirmish # oder campaign
+
+units:
+  Unit_Name:
+    template: Template_Unit_Name
+    base_unit: Skirmish_Unit_Name
+    campaign_unit: Campaign_Unit_Name
+
+    template_changes:
+      shield_points: +10%
+      energy_refresh_rate: +20%
+
+    cost_changes:
+      Tactical_Build_Cost_Multiplayer: -25% # 25% günstiger im Skirmish
+      Maintenance_Cost: +10% # 10% höhere Wartungskosten
+
+    squadrons:
+      delay_seconds: 0
+      starting:
+        0: # Tech Level
+          - type: Clone_Arc_170_Squadron
+            count: 2
+      reserve:
+        0:
+          - type: Clone_Arc_170_Squadron
+            count: 4
+
+    hardpoints:
+      fire_rate_increase: +100%
+      damage_increase: +200%
+      burst_delay_adjustment: -25%
+```
+
+### 🎛️ Verfügbare Parameter
+
+#### **Template Changes**
+
+- `shield_points`: Schildpunkte (z.B. `+10%`, `-5%`, `1000`)
+- `shield_refresh_rate`: Schild-Regeneration (z.B. `+50%`)
+- `energy_refresh_rate`: Energie-Regeneration (z.B. `+20%`)
+- `tactical_health`: Hüllenpunkte (z.B. `+15%`)
+- `population_value`: Bevölkerungsverbrauch (absoluter Wert)
+
+#### **Cost Changes** (nur für Skirmish)
+
+- `Tactical_Build_Cost_Multiplayer`: Kaufpreis für Multiplayer/Skirmish (z.B. `+25%`, `-10%`, `5000`)
+- `Tactical_Build_Cost_Campaign`: Kaufpreis für Campaign (z.B. `+25%`, `-10%`, `5000`)
+- `Build_Cost_Credits`: Allgemeiner Kaufpreis (z.B. `+25%`, `-10%`, `5000`)
+- `Maintenance_Cost`: Wartungskosten (z.B. `+25%`, `-10%`, `100`)
+
+#### **Hardpoint Changes**
+
+- `fire_rate_increase`: Feuerratenerhöhung (z.B. `+100%`)
+- `damage_increase`: Schadenserhöhung (z.B. `+200%`)
+- `burst_delay_adjustment`: Salven-Verzögerung (z.B. `-25%`)
+
+#### **Squadron Types**
+
+**Republik/Jedi Squadron-Typen:**
+
+- `Clone_ARC_170_Squadron` - Standard ARC-170 Geschwader
+- `Clone_ARC_170_Squadron_Double` - Doppeltes ARC-170 Geschwader
+- `Clone_ARC_170_Squadron_Half` - Halbes ARC-170 Geschwader
+- `Clone_Nimbus_V_Wing_Squadron` - V-Wing Geschwader
+- `Clone_BTLB_Y_Wing_Squadron` - Y-Wing Bomber Geschwader
+- `Clone_BTLB_Y_Wing_Squadron_Double` - Doppeltes Y-Wing Geschwader
+- `Clone_BTLB_Y_Wing_Squadron_Half` - Halbes Y-Wing Geschwader
+- `Torrent_Squadron` - Torrent Jäger Geschwader
+- `NTB_630_Squadron` - NTB-630 Bomber Geschwader
+- `Delta7_Squadron_Double` - Doppeltes Delta-7 Geschwader
+- `BTLS1_Y_Wing_Squadron` - BTLS1 Y-Wing Geschwader
+- `BTLS1_Y_Wing_Squadron_Double` - Doppeltes BTLS1 Y-Wing Geschwader
+- `BTLS1_Y_Wing_Squadron_Half` - Halbes BTLS1 Y-Wing Geschwader
+
+**Imperium Squadron-Typen:**
+
+- `TIE_Fighter_Squadron` - Standard TIE Fighter Geschwader
+- `TIE_Fighter_Squadron_Double` - Doppeltes TIE Fighter Geschwader
+- `TIE_Fighter_Squadron_Half` - Halbes TIE Fighter Geschwader
+- `TIE_Fighter_Squadron_Third` - Drittel TIE Fighter Geschwader
+- `TIE_Bomber_Squadron` - TIE Bomber Geschwader
+- `TIE_Bomber_Squadron_Double` - Doppeltes TIE Bomber Geschwader
+- `TIE_Bomber_Squadron_Half` - Halbes TIE Bomber Geschwader
+- `TIE_Starfighter_Squadron` - TIE Starfighter Geschwader
+- `TIE_Starfighter_Squadron_Double` - Doppeltes TIE Starfighter Geschwader
+- `TIE_Starfighter_Squadron_Half` - Halbes TIE Starfighter Geschwader
+- `TIE_Pod_Squadron` - TIE Pod Geschwader
+- `TIE_Pod_Squadron_Double` - Doppeltes TIE Pod Geschwader
+- `TIE_Pod_Squadron_Half` - Halbes TIE Pod Geschwader
+- `Missile_TIE_Squadron` - Missile TIE Geschwader
+
+**Allgemeine Squadron-Typen:**
+
+- `ARC_170_Squadron` - Standard ARC-170 Geschwader
+- `ARC_170_Squadron_Double` - Doppeltes ARC-170 Geschwader
+- `ARC_170_Squadron_Half` - Halbes ARC-170 Geschwader
+- `Nimbus_V_Wing_Squadron` - V-Wing Geschwader
+- `Nimbus_V_Wing_Squadron_Double` - Doppeltes V-Wing Geschwader
+- `Nimbus_V_Wing_Squadron_Half` - Halbes V-Wing Geschwader
+- `Y_Wing_Squadron` - Y-Wing Geschwader
+- `Y_Wing_Squadron_Double` - Doppeltes Y-Wing Geschwader
+- `Y_Wing_Squadron_Half` - Halbes Y-Wing Geschwader
+- `BTLB_Y_Wing_Squadron` - BTLB Y-Wing Geschwader
+- `BTLB_Y_Wing_Squadron_Double` - Doppeltes BTLB Y-Wing Geschwader
+- `BTLB_Y_Wing_Squadron_Half` - Halbes BTLB Y-Wing Geschwader
+- `Z95_Headhunter_Squadron` - Z-95 Headhunter Geschwader
+- `Z95_Headhunter_Squadron_Double` - Doppeltes Z-95 Geschwader
+- `Z95_Headhunter_Squadron_Half` - Halbes Z-95 Geschwader
+- `Z95XT_Headhunter_Squadron` - Z-95XT Headhunter Geschwader
+- `Z95XT_Headhunter_Squadron_Double` - Doppeltes Z-95XT Geschwader
+- `Z95XT_Headhunter_Squadron_Half` - Halbes Z-95XT Geschwader
+- `Z95ML_Headhunter_Squadron` - Z-95ML Headhunter Geschwader
+- `Z95ML_Headhunter_Squadron_Double` - Doppeltes Z-95ML Geschwader
+- `Z95ML_Headhunter_Squadron_Half` - Halbes Z-95ML Geschwader
+- `Z95_Bomber_Squadron` - Z-95 Bomber Geschwader
+- `Z95_Bomber_Squadron_Double` - Doppeltes Z-95 Bomber Geschwader
+- `Z95_Bomber_Squadron_Half` - Halbes Z-95 Bomber Geschwader
+
+**Spezial-Squadron-Typen:**
+
+- `Skipray_Squadron` - Skipray Geschwader
+- `Skipray_Squadron_Double` - Doppeltes Skipray Geschwader
+- `Skipray_Squadron_Half` - Halbes Skipray Geschwader
+- `Early_Skipray_Squadron` - Frühes Skipray Geschwader
+- `Early_Skipray_Squadron_Double` - Doppeltes frühes Skipray Geschwader
+- `Early_Skipray_Squadron_Half` - Halbes frühes Skipray Geschwader
+- `Mankvim_Squadron` - Mankvim Geschwader
+- `Mankvim_Squadron_Double` - Doppeltes Mankvim Geschwader
+- `Mankvim_Squadron_Half` - Halbes Mankvim Geschwader
+- `Aggressor_Assault_Fighter_Squadron` - Aggressor Assault Fighter Geschwader
+- `Aggressor_Assault_Fighter_Squadron_Double` - Doppeltes Aggressor Geschwader
+- `Aggressor_Assault_Fighter_Squadron_Half` - Halbes Aggressor Geschwader
+- `2_Warpod_Squadron` - 2-Warpod Geschwader
+- `2_Warpod_Squadron_Double` - Doppeltes 2-Warpod Geschwader
+- `2_Warpod_Squadron_Half` - Halbes 2-Warpod Geschwader
+- `N1_Squadron` - N-1 Starfighter Geschwader
+- `N1_Squadron_Skirmish` - N-1 Skirmish Geschwader
+- `N1_Squadron_Double` - Doppeltes N-1 Geschwader
+- `N1_Squadron_Half` - Halbes N-1 Geschwader
+- `G1_Squadron` - G-1 Starfighter Geschwader
+- `G1_Squadron_Double` - Doppeltes G-1 Geschwader
+- `G1_Squadron_Half` - Halbes G-1 Geschwader
+- `I_BEAM_Squadron` - I-BEAM Geschwader
+- `I_BEAM_Squadron_Double` - Doppeltes I-BEAM Geschwader
+- `I_BEAM_Squadron_Half` - Halbes I-BEAM Geschwader
+
+**Hutt/Underworld Squadron-Typen:**
+
+- `Cloakshape_Stock_Squadron` - Standard Cloakshape Geschwader
+- `Cloakshape_Stock_Squadron_Double` - Doppeltes Cloakshape Geschwader
+- `Cloakshape_Stock_Squadron_Half` - Halbes Cloakshape Geschwader
+- `Cloakshape_Squadron` - Cloakshape Geschwader
+- `Cloakshape_Squadron_Double` - Doppeltes Cloakshape Geschwader
+- `Cloakshape_Squadron_Half` - Halbes Cloakshape Geschwader
+- `Cloakshape_New_Squadron` - Neues Cloakshape Geschwader
+- `Cloakshape_New_Squadron_Double` - Doppeltes neues Cloakshape Geschwader
+- `Cloakshape_New_Squadron_Half` - Halbes neues Cloakshape Geschwader
+- `Toscan_Stock_Squadron` - Standard Toscan Geschwader
+- `Toscan_Stock_Squadron_Double` - Doppeltes Toscan Geschwader
+- `Toscan_Stock_Squadron_Half` - Halbes Toscan Geschwader
+- `Toscan_Missile_Squadron` - Toscan Missile Geschwader
+- `Toscan_Missile_Squadron_Double` - Doppeltes Toscan Missile Geschwader
+- `Toscan_Missile_Squadron_Half` - Halbes Toscan Missile Geschwader
+- `Toscan_Gunship_Squadron` - Toscan Gunship Geschwader
+- `Toscan_Gunship_Squadron_Double` - Doppeltes Toscan Gunship Geschwader
+- `Toscan_Gunship_Squadron_Half` - Halbes Toscan Gunship Geschwader
+- `Toscan_Interceptor_Squadron` - Toscan Interceptor Geschwader
+- `Toscan_Interceptor_Squadron_Double` - Doppeltes Toscan Interceptor Geschwader
+- `Toscan_Interceptor_Squadron_Half` - Halbes Toscan Interceptor Geschwader
+- `Toscan_Bomber_Squadron` - Toscan Bomber Geschwader
+- `Toscan_Bomber_Squadron_Double` - Doppeltes Toscan Bomber Geschwader
+- `Toscan_Bomber_Squadron_Half` - Halbes Toscan Bomber Geschwader
+
+**Spezial-Hero Squadron-Typen:**
+
+- `Firespray_Squadron` - Firespray Geschwader
+- `Firespray_Squadron_Double` - Doppeltes Firespray Geschwader
+- `Firespray_Squadron_Half` - Halbes Firespray Geschwader
+- `Firespray_Gunship_Squadron` - Firespray Gunship Geschwader
+- `Firespray_Gunship_Squadron_Double` - Doppeltes Firespray Gunship Geschwader
+- `Firespray_Gunship_Squadron_Half` - Halbes Firespray Gunship Geschwader
+- `Firespray_Bomber_Squadron` - Firespray Bomber Geschwader
+- `Firespray_Bomber_Squadron_Double` - Doppeltes Firespray Bomber Geschwader
+- `Firespray_Bomber_Squadron_Half` - Halbes Firespray Bomber Geschwader
+- `R22_Spearhead_Squadron` - R-22 Spearhead Geschwader
+- `R22_Spearhead_Squadron_Double` - Doppeltes R-22 Spearhead Geschwader
+
+**Mission/PDF Squadron-Typen:**
+
+- `PDF_Z95_Headhunter_Squadron` - PDF Z-95 Headhunter Geschwader
+- `H60_Tempest_Squadron` - H-60 Tempest Geschwader
+- `Gozanti_Cruiser_Squadron` - Gozanti Cruiser Geschwader
+- `Citadel_Cruiser_Squadron` - Citadel Cruiser Geschwader
+
+**Hinweise:**
+
+- **Double/Half Varianten**: Bieten unterschiedliche Geschwader-Größen
+- **Fraktions-spezifisch**: Einige Squadron-Typen sind nur für bestimmte Fraktionen verfügbar
+- **Tech Level**: Verschiedene Squadron-Typen sind für verschiedene Tech Levels verfügbar
+- **Verfügbarkeit**: Nicht alle Squadron-Typen sind in allen Spielmodi verfügbar
+
+## 🚀 Verwendung
+
+### 📋 Kommandozeile
+
+```bash
+# Standard-Ausführung
+python swma.py --config shipchanges.yaml
+
+# Ohne Backups (nicht empfohlen)
+python swma.py --config shipchanges.yaml --no-backup
+
+# Vorschau-Modus
+python swma.py --config shipchanges.yaml --preview
+
+# Reset aller Änderungen
+python swma.py --config shipchanges.yaml --reset
+
+# Reset einer spezifischen Einheit
+python swma.py --config shipchanges.yaml --reset-unit "Acclamator_II"
+```
+
+### 🔄 Workflow
+
+1. **Konfiguration erstellen**: `shipchanges.yaml` anpassen
+2. **Tool ausführen**: `python swma.py --config shipchanges.yaml`
+3. **Automatische Backups**: Werden bei der ersten Ausführung erstellt
+4. **Wiederherstellung**: Alle Dateien werden von Backups wiederhergestellt
+5. **Änderungen anwenden**: Neue Modifikationen werden angewendet
+
+## ⚠️ Wichtige Hinweise
+
+### 🔒 Sicherheit
+
+- **Immer Backups aktiviert lassen** (`--no-backup` nur für Tests)
+- **Backup-Verzeichnis nicht löschen** - enthält Originale
+- **Tool nicht während Spielausführung** verwenden
+
+### 🎯 Best Practices
+
+- **Kleine Änderungen testen** vor großen Modifikationen
+- **Prozentuale Werte verwenden** für bessere Kontrolle
+- **Hardpoint-Parameter kombinieren** für optimale Ergebnisse
+- **Geschwader-Platzierung automatisch** vom Tool bestimmen lassen
+
+### 🐛 Fehlerbehebung
+
+- **"Kein Backup gefunden"**: Manuelles Backup einspielen
+- **"Unit nicht gefunden"**: Unit-Namen in YAML prüfen
+- **"Hardpoint nicht gefunden"**: Schiffsklasse prüfen (Frigates/Capitals)
+
+## 📈 Performance-Optimierung
+
+### ⚡ Hardpoint-Kombinationen
+
+```yaml
+# Hohe Feuerrate + hoher Schaden
+hardpoints:
+  fire_rate_increase: +100%
+  damage_increase: +200%
+  burst_delay_adjustment: -25%
+
+# Ausgewogene Konfiguration
+hardpoints:
+  fire_rate_increase: +50%
+  damage_increase: +100%
+  burst_delay_adjustment: -10%
+
+# Defensive Konfiguration
+hardpoints:
+  fire_rate_increase: +25%
+  damage_increase: +50%
+  burst_delay_adjustment: +10%
+```
+
+### 🎮 Spielbalance
+
+- **Fire Rate**: Beeinflusst DPS am stärksten
+- **Damage Increase**: Erhöht Burst-Schaden
+- **Burst Delay**: Kontrolliert Feuerrate innerhalb von Salven
+
+## 🔮 Zukünftige Erweiterungen
+
+### 📋 Geplante Features
+
+- [ ] Unterstützung für andere Fraktionen (CIS, Empire)
+- [ ] Automatische Balance-Tests
+- [ ] GUI-Interface
+- [ ] Batch-Verarbeitung mehrerer Konfigurationen
+- [ ] Integration mit Mod-Managern
+
+### 🛠️ Technische Verbesserungen
+
+- [ ] Caching für bessere Performance
+- [ ] Erweiterte Validierung
+- [ ] Logging-System
+- [ ] Unit-Tests
+
+## 📞 Support
+
+### 🐛 Bug Reports
+
+Bei Problemen bitte folgende Informationen bereitstellen:
+
+- SWMA Tool Version
+- Python Version
+- Fehlermeldung (vollständig)
+- Konfigurationsdatei (anonymisiert)
+- Betroffene XML-Dateien
+
+### 💡 Feature Requests
+
+Neue Features können über GitHub Issues vorgeschlagen werden.
+
+---
+
+**Version**: 2.0  
+**Letzte Aktualisierung**: 2025-08-02  
+**Autor**: SWMA Tool Development Team
