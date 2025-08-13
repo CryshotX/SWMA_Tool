@@ -460,15 +460,15 @@
 		<Space_FOW_Reveal_Range>2500.0</Space_FOW_Reveal_Range>
 		<No_Colorization_Color> 255, 255, 255, 255 </No_Colorization_Color>
 
-		<Starting_Spawned_Units_Tech_0>Clone_ARC_170_Squadron, 1</Starting_Spawned_Units_Tech_0>
-		<Starting_Spawned_Units_Tech_0>Torrent_Squadron, 1</Starting_Spawned_Units_Tech_0>
-		<Starting_Spawned_Units_Tech_0>Clone_BTLB_Y_Wing_Squadron, 1</Starting_Spawned_Units_Tech_0>
-		<Starting_Spawned_Units_Tech_0>NTB_630_Squadron, 1</Starting_Spawned_Units_Tech_0> <!-- Put after all other bombers so iconic bombing run units happen instead -->
+		<Starting_Spawned_Units_Tech_0>Clone_ARC_170_Squadron, 2</Starting_Spawned_Units_Tech_0>
+		<Starting_Spawned_Units_Tech_0>Torrent_Squadron, 2</Starting_Spawned_Units_Tech_0>
+		<Starting_Spawned_Units_Tech_0>Clone_BTLB_Y_Wing_Squadron, 2</Starting_Spawned_Units_Tech_0>
+		<Starting_Spawned_Units_Tech_0>NTB_630_Squadron, 2</Starting_Spawned_Units_Tech_0> <!-- Put after all other bombers so iconic bombing run units happen instead -->
 
-		<Starting_Spawned_Units_Tech_4>Clone_ARC_170_Squadron, 1</Starting_Spawned_Units_Tech_4>
-		<Starting_Spawned_Units_Tech_4>Clone_Nimbus_V_Wing_Squadron, 1</Starting_Spawned_Units_Tech_4>
-		<Starting_Spawned_Units_Tech_4>Clone_BTLB_Y_Wing_Squadron, 1</Starting_Spawned_Units_Tech_4>
-		<Starting_Spawned_Units_Tech_4>NTB_630_Squadron, 1</Starting_Spawned_Units_Tech_4> <!-- Put after all other bombers so iconic bombing run units happen instead -->
+		<Starting_Spawned_Units_Tech_4>Clone_ARC_170_Squadron, 2</Starting_Spawned_Units_Tech_4>
+		<Starting_Spawned_Units_Tech_4>Clone_Nimbus_V_Wing_Squadron, 2</Starting_Spawned_Units_Tech_4>
+		<Starting_Spawned_Units_Tech_4>Clone_BTLB_Y_Wing_Squadron, 2</Starting_Spawned_Units_Tech_4>
+		<Starting_Spawned_Units_Tech_4>NTB_630_Squadron, 2</Starting_Spawned_Units_Tech_4> <!-- Put after all other bombers so iconic bombing run units happen instead -->
 
 		<Reserve_Spawned_Units_Tech_0>Clone_ARC_170_Squadron, 3</Reserve_Spawned_Units_Tech_0>
 		<Reserve_Spawned_Units_Tech_0>Torrent_Squadron, 4</Reserve_Spawned_Units_Tech_0>

@@ -2736,21 +2736,21 @@
 
 		<Build_Initially_Locked>Yes</Build_Initially_Locked>
 
-		<Starting_Spawned_Units_Tech_1> Cloakshape_Stock_Squadron, 1 </Starting_Spawned_Units_Tech_1>
-		<Starting_Spawned_Units_Tech_2> Torrent_Squadron, 1 </Starting_Spawned_Units_Tech_2>
-		<Starting_Spawned_Units_Tech_4> Clone_Nimbus_V_Wing_Squadron, 1 </Starting_Spawned_Units_Tech_4>
+		<Starting_Spawned_Units_Tech_1> Cloakshape_Stock_Squadron, 3 </Starting_Spawned_Units_Tech_1>
+		<Starting_Spawned_Units_Tech_2> Torrent_Squadron, 3 </Starting_Spawned_Units_Tech_2>
+		<Starting_Spawned_Units_Tech_4> Clone_Nimbus_V_Wing_Squadron, 3 </Starting_Spawned_Units_Tech_4>
 		
-		<Starting_Spawned_Units_Tech_1> Cloakshape_Squadron, 1 </Starting_Spawned_Units_Tech_1>
-		<Starting_Spawned_Units_Tech_2> Clone_Arc_170_Squadron, 1 </Starting_Spawned_Units_Tech_2>
-		<Starting_Spawned_Units_Tech_4> Clone_Arc_170_Squadron, 1 </Starting_Spawned_Units_Tech_4>
+		<Starting_Spawned_Units_Tech_1> Cloakshape_Squadron, 3 </Starting_Spawned_Units_Tech_1>
+		<Starting_Spawned_Units_Tech_2> Clone_Arc_170_Squadron, 3</Starting_Spawned_Units_Tech_2>
+		<Starting_Spawned_Units_Tech_4> Clone_Arc_170_Squadron, 3 </Starting_Spawned_Units_Tech_4>
 		
-		<Starting_Spawned_Units_Tech_1> 2_Warpod_Squadron, 1 </Starting_Spawned_Units_Tech_1>
-		<Starting_Spawned_Units_Tech_2> Clone_BTLB_Y_Wing_Squadron, 1 </Starting_Spawned_Units_Tech_2>
-		<Starting_Spawned_Units_Tech_4> Clone_BTLB_Y_Wing_Squadron, 1 </Starting_Spawned_Units_Tech_4>
+		<Starting_Spawned_Units_Tech_1> 2_Warpod_Squadron, 3 </Starting_Spawned_Units_Tech_1>
+		<Starting_Spawned_Units_Tech_2> Clone_BTLB_Y_Wing_Squadron, 3 </Starting_Spawned_Units_Tech_2>
+		<Starting_Spawned_Units_Tech_4> Clone_BTLB_Y_Wing_Squadron, 3 </Starting_Spawned_Units_Tech_4>
 		
-		<Starting_Spawned_Units_Tech_1> Scurrg_H6_Prototype_Squadron, 1 </Starting_Spawned_Units_Tech_1>
-		<Starting_Spawned_Units_Tech_2> NTB_630_Squadron, 1 </Starting_Spawned_Units_Tech_2>
-		<Starting_Spawned_Units_Tech_4> NTB_630_Squadron, 1 </Starting_Spawned_Units_Tech_4>
+		<Starting_Spawned_Units_Tech_1> Scurrg_H6_Prototype_Squadron, 3 </Starting_Spawned_Units_Tech_1>
+		<Starting_Spawned_Units_Tech_2> NTB_630_Squadron, 3 </Starting_Spawned_Units_Tech_2>
+		<Starting_Spawned_Units_Tech_4> NTB_630_Squadron, 3 </Starting_Spawned_Units_Tech_4>
 		
 		<Spawned_Squadron_Delay_Seconds> 15 </Spawned_Squadron_Delay_Seconds>
 		
@@ -3618,17 +3618,17 @@
 
 		<Lua_Script>GenericGameObject</Lua_Script>
 
-		<Starting_Spawned_Units_Tech_1> Cloakshape_Stock_Squadron_Double, 1 </Starting_Spawned_Units_Tech_1>
-		<Starting_Spawned_Units_Tech_2> Torrent_Squadron_Double, 1 </Starting_Spawned_Units_Tech_2>
-		<Starting_Spawned_Units_Tech_4> Clone_Nimbus_V_Wing_Squadron_Double, 1 </Starting_Spawned_Units_Tech_4>
+		<Starting_Spawned_Units_Tech_1> Cloakshape_Stock_Squadron_Double, 2 </Starting_Spawned_Units_Tech_1>
+		<Starting_Spawned_Units_Tech_2> Torrent_Squadron_Double, 2 </Starting_Spawned_Units_Tech_2>
+		<Starting_Spawned_Units_Tech_4> Clone_Nimbus_V_Wing_Squadron_Double, 2 </Starting_Spawned_Units_Tech_4>
 		
-		<Starting_Spawned_Units_Tech_1> 2_Warpod_Squadron, 1 </Starting_Spawned_Units_Tech_1>
-		<Starting_Spawned_Units_Tech_2> Clone_BTLB_Y_Wing_Squadron, 1 </Starting_Spawned_Units_Tech_2>
-		<Starting_Spawned_Units_Tech_4> Clone_BTLB_Y_Wing_Squadron, 1 </Starting_Spawned_Units_Tech_4>
+		<Starting_Spawned_Units_Tech_1> 2_Warpod_Squadron, 2 </Starting_Spawned_Units_Tech_1>
+		<Starting_Spawned_Units_Tech_2> Clone_BTLB_Y_Wing_Squadron, 2 </Starting_Spawned_Units_Tech_2>
+		<Starting_Spawned_Units_Tech_4> Clone_BTLB_Y_Wing_Squadron, 2 </Starting_Spawned_Units_Tech_4>
 		
-		<Starting_Spawned_Units_Tech_1> Early_Skipray_Squadron_Half, 1 </Starting_Spawned_Units_Tech_1>
-		<Starting_Spawned_Units_Tech_2> Early_Skipray_Squadron_Half, 1 </Starting_Spawned_Units_Tech_2>
-		<Starting_Spawned_Units_Tech_4> Early_Skipray_Squadron_Half, 1 </Starting_Spawned_Units_Tech_4>
+		<Starting_Spawned_Units_Tech_1> Early_Skipray_Squadron_Half, 2 </Starting_Spawned_Units_Tech_1>
+		<Starting_Spawned_Units_Tech_2> Early_Skipray_Squadron_Half, 2 </Starting_Spawned_Units_Tech_2>
+		<Starting_Spawned_Units_Tech_4> Early_Skipray_Squadron_Half, 2 </Starting_Spawned_Units_Tech_4>
 		
 		<Spawned_Squadron_Delay_Seconds> 15 </Spawned_Squadron_Delay_Seconds>
 

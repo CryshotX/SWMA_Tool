@@ -46,7 +46,8 @@ units:
     base_unit: Skirmish_Venator_Star_Destroyer
     campaign_unit: Venator_Star_Destroyer
     template_changes:
-      shield_refresh_rate: +50%
+      shield_refresh_rate: +1000%
+      shield_points: +700%
       population_value: 10
     squadrons:
       delay_seconds: 1
@@ -171,11 +172,12 @@ units:
     campaign_unit: Maelstrom_Battlecruiser
     template_changes:
       shield_refresh_rate: +30%
+      shield_points: +30%
       energy_refresh_rate: +20%
       population_value: 15
-    cost_changes:
-      Tactical_Build_Cost_Multiplayer: +25%
-      Tactical_Build_Cost_Campaign: +15%
+    hardpoints:
+      damage_increase: +20%
+      burst_delay_adjustment: -40%
     squadrons:
       delay_seconds: 2
       starting:
@@ -226,6 +228,7 @@ units:
     campaign_unit: Procurator_Battlecruiser
     template_changes:
       shield_refresh_rate: +50%
+      shield_points: +30%
       energy_refresh_rate: +25%
       population_value: 18
     squadrons:
@@ -243,9 +246,8 @@ units:
           - type: Clone_Nimbus_V_Wing_Squadron
             count: 12
     hardpoints:
-      fire_rate_increase: +45%
       damage_increase: +20%
-      burst_delay_adjustment: -15%
+      burst_delay_adjustment: -40%
 
   Acclamator_Destroyer:
     base_unit: Skirmish_Acclamator_Destroyer
@@ -268,3 +270,6 @@ units:
             count: 4
           - type: Clone_Nimbus_V_Wing_Squadron
             count: 4
+    hardpoints:
+      damage_increase: +20%
+      burst_delay_adjustment: -40%

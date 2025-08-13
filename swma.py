@@ -15,6 +15,8 @@ import shutil
 from datetime import datetime
 from pathlib import Path
 import argparse
+import re
+import subprocess
 from typing import Dict, List, Any, Optional, Tuple
 
 class BackupManager:
@@ -268,6 +270,11 @@ class SWModdingTool:
         self.xml_processor = XMLProcessor()
         self.config = self.load_config()
         
+        # Text-Verzeichnis (Schwesterordner von XML)
+        self.text_base_dir = self.xml_base_dir.parent / "Text"
+        # Merker: Wurden Text/Tooltip-Dateien geändert?
+        self.text_changes_applied: bool = False
+        
     def load_config(self) -> Dict[str, Any]:
         """Lädt die Konfigurationsdatei"""
         try:
@@ -282,7 +289,12 @@ class SWModdingTool:
     def get_ship_class(self, unit_name: str) -> str:
         """Ermittelt die Schiffsklasse basierend auf dem Namen"""
         frigate_keywords = ['acclamator', 'venator', 'victory', 'frigate']
-        capital_keywords = ['star_destroyer', 'tector', 'secutor', 'capital']
+        # Erweiterte Erkennung für Großkampfschiffe/Battlecruiser/Dreadnoughts
+        capital_keywords = [
+            'star_destroyer', 'tector', 'secutor', 'capital',
+            'praetor', 'procurator', 'mandator', 'maelstrom',
+            'battlecruiser', 'dreadnought', 'imperator'
+        ]
         
         unit_lower = unit_name.lower()
         
@@ -405,7 +417,8 @@ class SWModdingTool:
         template_name = unit_config.get('template')
         
         if not template_name:
-            print(f"Kein Template für Einheit angegeben")
+            print(f"Kein Template für Einheit angegeben – versuche, Änderungen direkt auf Units anzuwenden")
+            self.apply_unit_changes_fallback(unit_config)
             return
         
         template_element = self.xml_processor.find_template_element(tree, template_name)
@@ -437,6 +450,13 @@ class SWModdingTool:
         
         # Speichern
         self.xml_processor.save_xml(tree, template_file)
+
+        # Tooltips/Textdateien aktualisieren, falls relevante Werte angepasst wurden
+        if any(k in updated_values for k in ("shield_points", "shield_refresh_rate", "tactical_health")):
+            try:
+                self.update_tooltips_for_unit(unit_config, updated_values)
+            except Exception as e:
+                print(f"Warnung: Konnte Tooltips nicht aktualisieren: {e}")
     
 
     
@@ -727,6 +747,57 @@ class SWModdingTool:
         
         # Speichern
         self.xml_processor.save_xml(tree, hardpoint_file)
+
+    def apply_unit_changes_fallback(self, unit_config: Dict[str, Any]):
+        """Wendet 'template_changes' ersatzweise direkt auf Campaign-/Skirmish-Units an,
+        wenn kein Template angegeben ist (z.B. bei Praetor/Procurator)."""
+        if 'template_changes' not in unit_config:
+            return
+
+        changes = unit_config['template_changes']
+
+        # Dateien bestimmen
+        campaign_file = str(self.xml_base_dir / "Units/Republic_Space_Units.xml")
+        skirmish_file = str(self.xml_base_dir / "Units/Skirmish/SkirmishUnits_Republic.xml")
+
+        # Ziel-Units ermitteln
+        campaign_unit_name = unit_config.get('campaign_unit')
+        skirmish_unit_name = unit_config.get('base_unit')
+
+        # Auf Campaign anwenden
+        if campaign_unit_name:
+            try:
+                tree = self.xml_processor.load_xml(campaign_file)
+                unit_element = self.xml_processor.find_unit_element(tree, campaign_unit_name)
+                if unit_element is not None:
+                    updated_values: Dict[str, Any] = {}
+                    for property_name, change_value in changes.items():
+                        original_value = self.xml_processor.get_original_value(unit_element, property_name)
+                        if original_value is None and isinstance(change_value, str) and change_value.endswith('%'):
+                            print(f"  Warnung: Originalwert nicht gefunden für {property_name} (Campaign), Prozentänderung übersprungen")
+                            continue
+                        if isinstance(change_value, str) and change_value.endswith('%') and original_value is not None:
+                            new_value = self.calculate_percentage_value(original_value, change_value)
+                        else:
+                            new_value = change_value
+                        self.xml_processor.set_value(unit_element, property_name, new_value)
+                        print(f"  (Campaign) {campaign_unit_name} {property_name}: {original_value} -> {new_value}")
+                        updated_values[property_name] = new_value
+                    self.xml_processor.save_xml(tree, campaign_file)
+
+                    # Tooltips/Textdateien aktualisieren, falls relevante Werte angepasst wurden
+                    if any(k in updated_values for k in ("shield_points", "shield_refresh_rate", "tactical_health")):
+                        try:
+                            self.update_tooltips_for_unit(unit_config, updated_values)
+                        except Exception as e:
+                            print(f"  Warnung: Konnte Tooltips nicht aktualisieren: {e}")
+                else:
+                    print(f"  Campaign-Unit nicht gefunden: {campaign_unit_name}")
+            except Exception as e:
+                print(f"  Warnung: Konnte Änderungen nicht auf Campaign-Unit anwenden: {e}")
+
+        # WICHTIG: Keine direkten Änderungen auf Skirmish-Unit setzen, da Vererbung additiv ist
+        # und Skirmish-Units i.d.R. von Campaign-Units erben. Skirmish übernimmt Werte aus Campaign.
     
     def apply_changes(self):
         """Wendet alle Änderungen aus der Konfiguration an"""
@@ -781,6 +852,10 @@ class SWModdingTool:
         
         print("\n" + "=" * 50)
         print("Alle Änderungen erfolgreich angewendet!")
+
+        # Falls Textdateien geändert wurden, automatisch DATs neu bauen
+        if self.text_changes_applied:
+            self.rebuild_text_dat()
 
     def reset_template_changes(self, unit_config: Dict[str, Any], template_file: str):
         """Setzt alle Template-Änderungen auf Originalwerte zurück"""
@@ -1043,6 +1118,184 @@ class SWModdingTool:
                 return element
         
         return None
+
+    # -------- Tooltip/Text-Update-Funktionen --------
+    def get_encyclopedia_text_keys(self, unit_config: Dict[str, Any]) -> List[str]:
+        """Extrahiert alle TEXT_* Keys aus <Encyclopedia_Text> für die Einheit aus Campaign und Skirmish."""
+        unit_name = unit_config.get('campaign_unit') or unit_config.get('base_unit')
+        if not unit_name:
+            return []
+        files_to_check = [
+            str(self.xml_base_dir / "Units/Republic_Space_Units.xml"),
+            str(self.xml_base_dir / "Units/Skirmish/SkirmishUnits_Republic.xml"),
+        ]
+        seen = set()
+        ordered_keys: List[str] = []
+        for file_path in files_to_check:
+            try:
+                tree = self.xml_processor.load_xml(file_path)
+                unit_element = self.xml_processor.find_unit_element(tree, unit_name)
+                if unit_element is None:
+                    continue
+                enc_el = unit_element.find('Encyclopedia_Text')
+                if enc_el is None:
+                    continue
+                text_blob = ''.join(list(enc_el.itertext()))
+                tokens = re.split(r"\s+|,", text_blob.strip())
+                keys = [t for t in tokens if t and t.startswith('TEXT_')]
+                for k in keys:
+                    if k not in seen:
+                        seen.add(k)
+                        ordered_keys.append(k)
+            except Exception:
+                continue
+        return ordered_keys
+
+    def find_text_file_containing_key(self, key: str) -> Optional[Path]:
+        """Durchsucht das Text-Verzeichnis nach einer Zeile, die mit 'KEY,' beginnt."""
+        if not self.text_base_dir.exists():
+            return None
+        for txt_path in sorted(self.text_base_dir.glob('*.txt')):
+            try:
+                with open(txt_path, 'r', encoding='utf-8') as f:
+                    for line in f:
+                        if line.startswith(f"{key},"):
+                            return txt_path
+            except Exception:
+                continue
+        return None
+
+    def update_text_line_in_file(self, txt_path: Path, key: str, updated_values: Dict[str, Any]) -> bool:
+        """Aktualisiert eine einzelne Zeile in der angegebenen Textdatei. Gibt True zurück, wenn eine Änderung erfolgte."""
+        try:
+            with open(txt_path, 'r', encoding='utf-8') as f:
+                lines = f.readlines()
+        except Exception as e:
+            print(f"  Warnung: Konnte Datei nicht lesen: {txt_path} ({e})")
+            return False
+
+        changed = False
+        for i, line in enumerate(lines):
+            if not line.startswith(f"{key},"):
+                continue
+            prefix, value = line.split(',', 1)
+            new_value = value.rstrip('\n')
+
+            # Muster 1: Separater Schild-Tooltip wie "Shields: 450 / [9/R] (Corvette)"
+            if re.search(r"Shields?:", new_value):
+                # Schildpunkte ersetzen
+                if 'shield_points' in updated_values:
+                    def repl_points(m: re.Match) -> str:
+                        return f"{m.group(1)}{int(round(float(updated_values['shield_points'])))}"
+                    new_value_tmp = re.sub(r"(Shields?:\s*)(\d+)", repl_points, new_value)
+                    new_value = new_value_tmp
+
+                # Refresh-Rate ersetzen, wenn vorhanden als [...] mit /R
+                if 'shield_refresh_rate' in updated_values:
+                    def repl_rate(m: re.Match) -> str:
+                        # Erhalte eventuelles Dezimalformat
+                        rate = float(updated_values['shield_refresh_rate'])
+                        return f"[{rate}/R]" if '.' in m.group(1) else f"[{int(round(rate))}/R]"
+                    new_value = re.sub(r"\[(\d+(?:\.\d+)?)\/R\]", repl_rate, new_value)
+
+            # Muster 2: Statblock-Basis: "Health: A | Shields: B" oder "Health: A | Unshielded"
+            if re.search(r"Health:\s*\d+", new_value) or "Unshielded" in new_value:
+                # Health aktualisieren
+                if 'tactical_health' in updated_values:
+                    def repl_health(m: re.Match) -> str:
+                        return f"{m.group(1)}{int(round(float(updated_values['tactical_health'])))}"
+                    new_value = re.sub(r"(Health:\s*)(\d+)", repl_health, new_value)
+
+                # Shields aktualisieren
+                if 'shield_points' in updated_values:
+                    sp = int(round(float(updated_values['shield_points'])))
+                    if sp <= 0:
+                        # Zu "Unshielded" migrieren
+                        if "Shields:" in new_value or "Shield:" in new_value:
+                            new_value = re.sub(r"Shields?:\s*\d+", "Unshielded", new_value)
+                        else:
+                            new_value = new_value.replace("Unshielded", "Unshielded")
+                    else:
+                        if "Unshielded" in new_value:
+                            new_value = new_value.replace("Unshielded", f"Shields: {sp}")
+                        else:
+                            def repl_shields(m: re.Match) -> str:
+                                return f"{m.group(1)}{sp}"
+                            new_value = re.sub(r"(Shields?:\s*)(\d+)", repl_shields, new_value)
+            
+            # Muster 3: Separater HULL-Tooltip: "Hull: A (Class)"
+            if 'tactical_health' in updated_values and re.search(r"Hull:\s*\d+", new_value):
+                def repl_hull(m: re.Match) -> str:
+                    return f"{m.group(1)}{int(round(float(updated_values['tactical_health'])))}"
+                new_value = re.sub(r"(Hull:\s*)(\d+)", repl_hull, new_value)
+
+            if new_value != value.rstrip('\n'):
+                # Backup anlegen, falls noch nicht vorhanden
+                try:
+                    if self.backup_manager:
+                        self.backup_manager.create_backup(str(txt_path))
+                except Exception:
+                    pass
+                lines[i] = f"{prefix},{new_value}\n"
+                changed = True
+                print(f"  Tooltip aktualisiert: {key} -> {new_value}")
+                break
+
+        if changed:
+            try:
+                with open(txt_path, 'w', encoding='utf-8') as f:
+                    f.writelines(lines)
+            except Exception as e:
+                print(f"  Warnung: Konnte Datei nicht schreiben: {txt_path} ({e})")
+                return False
+            # Globales Flag setzen
+            self.text_changes_applied = True
+        return changed
+
+    def update_tooltips_for_unit(self, unit_config: Dict[str, Any], updated_values: Dict[str, Any]):
+        """Aktualisiert Tooltip-/Statblock-Texte auf Basis der geänderten Werte."""
+        keys = self.get_encyclopedia_text_keys(unit_config)
+        if not keys:
+            return
+
+        # Relevante Keys filtern
+        candidate_keys: List[str] = []
+        for k in keys:
+            if "_SHIELD" in k:
+                candidate_keys.append(k)
+            elif "_HULL" in k:
+                candidate_keys.append(k)
+            elif re.match(r"TEXT_STATBLOCK_.*_BASE$", k):
+                candidate_keys.append(k)
+
+        # Nichts zu tun
+        if not candidate_keys:
+            return
+
+        for key in candidate_keys:
+            txt_path = self.find_text_file_containing_key(key)
+            if not txt_path:
+                print(f"  Hinweis: Kein Textfile für {key} gefunden")
+                continue
+            self.update_text_line_in_file(txt_path, key, updated_values)
+
+    def rebuild_text_dat(self):
+        """Führt den Text-Build aus (alphabetize-and-build.bat), falls vorhanden."""
+        try:
+            if not self.text_base_dir.exists():
+                print("Hinweis: Text-Verzeichnis nicht gefunden, überspringe DAT-Build")
+                return
+            bat_path = self.text_base_dir / "alphabetize-and-build.bat"
+            if not bat_path.exists():
+                print("Hinweis: Build-Skript 'alphabetize-and-build.bat' nicht gefunden, überspringe DAT-Build")
+                return
+            print("Starte automatischen DAT-Build der Textdateien...")
+            subprocess.run(["cmd", "/c", str(bat_path.name)], cwd=self.text_base_dir, check=True)
+            print("DAT-Build abgeschlossen.")
+        except subprocess.CalledProcessError as e:
+            print(f"Warnung: DAT-Build fehlgeschlagen (Exit {e.returncode})")
+        except Exception as e:
+            print(f"Warnung: Konnte DAT-Build nicht ausführen: {e}")
 
     def reset_changes(self, unit_name: str = None):
         """Setzt alle Änderungen für eine Einheit oder alle Einheiten zurück"""
