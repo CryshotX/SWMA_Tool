@@ -441,6 +441,13 @@ class SWModdingTool:
                 new_value = self.calculate_percentage_value(original_value, change_value)
             else:
                 new_value = change_value
+
+            # Schildwerte immer auf ganze Zahlen runden
+            if property_name in ("shield_points", "shield_refresh_rate"):
+                try:
+                    new_value = int(round(float(new_value)))
+                except Exception:
+                    pass
             
             self.xml_processor.set_value(template_element, property_name, new_value)
             print(f"  {property_name}: {original_value} -> {new_value}")
@@ -780,6 +787,12 @@ class SWModdingTool:
                             new_value = self.calculate_percentage_value(original_value, change_value)
                         else:
                             new_value = change_value
+                        # Schildwerte immer auf ganze Zahlen runden
+                        if property_name in ("shield_points", "shield_refresh_rate"):
+                            try:
+                                new_value = int(round(float(new_value)))
+                            except Exception:
+                                pass
                         self.xml_processor.set_value(unit_element, property_name, new_value)
                         print(f"  (Campaign) {campaign_unit_name} {property_name}: {original_value} -> {new_value}")
                         updated_values[property_name] = new_value
