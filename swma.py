@@ -275,6 +275,10 @@ class SWModdingTool:
         # Merker: Wurden Text/Tooltip-Dateien geändert?
         self.text_changes_applied: bool = False
         
+        # KDY Markt Lua-Dateien
+        self.ship_market_options = self.xml_base_dir.parent / "Scripts/Library/ShipMarketOptions.lua"
+        self.ship_market_adjustments = self.xml_base_dir.parent / "Scripts/Library/ShipMarketAdjustmentsLibrary.lua"
+        
     def load_config(self) -> Dict[str, Any]:
         """Lädt die Konfigurationsdatei"""
         try:
@@ -863,6 +867,10 @@ class SWModdingTool:
             if game_mode == 'skirmish' and 'cost_changes' in unit_config:
                 self.apply_cost_changes(unit_config, target_files['squadrons'])
         
+        # KDY Markt-Verarbeitung
+        if 'kdy_market' in self.config:
+            self.process_kdy_market()
+        
         print("\n" + "=" * 50)
         print("Alle Änderungen erfolgreich angewendet!")
 
@@ -1357,6 +1365,167 @@ class SWModdingTool:
         
         print("\n" + "=" * 50)
         print("Alle Änderungen erfolgreich zurückgesetzt!")
+
+    def process_kdy_market(self):
+        """Verarbeitet KDY Markt-Konfigurationen"""
+        if 'kdy_market' not in self.config:
+            return
+            
+        kdy_config = self.config['kdy_market']
+        
+        if not kdy_config.get('enabled', True):
+            print("KDY Markt ist deaktiviert.")
+            return
+            
+        print("🛒 Verarbeite KDY Markt-Konfiguration...")
+        
+        # ShipMarketOptions.lua bearbeiten
+        self.process_ship_market_options(kdy_config)
+        
+        # ShipMarketAdjustmentsLibrary.lua bearbeiten
+        self.process_ship_market_adjustments(kdy_config)
+        
+        print("✅ KDY Markt-Konfiguration abgeschlossen.")
+
+    def process_ship_market_options(self, kdy_config):
+        """Bearbeitet ShipMarketOptions.lua"""
+        if not self.ship_market_options.exists():
+            print(f"⚠️  Datei nicht gefunden: {self.ship_market_options}")
+            return
+            
+        with open(self.ship_market_options, 'r', encoding='utf-8') as f:
+            content = f.read()
+            
+        # Aktuelle Werte extrahieren (als Backup)
+        current_ships = self.extract_current_ship_values(content)
+        
+        # Neue Werte anwenden
+        if 'ships' in kdy_config:
+            for ship_name, ship_config in kdy_config['ships'].items():
+                content = self.update_ship_market_entry(content, ship_name, ship_config)
+                
+        # Datei speichern
+        with open(self.ship_market_options, 'w', encoding='utf-8') as f:
+            f.write(content)
+        print(f"✅ {self.ship_market_options.name} aktualisiert")
+
+    def process_ship_market_adjustments(self, kdy_config):
+        """Bearbeitet ShipMarketAdjustmentsLibrary.lua"""
+        if not self.ship_market_adjustments.exists():
+            print(f"⚠️  Datei nicht gefunden: {self.ship_market_adjustments}")
+            return
+            
+        with open(self.ship_market_adjustments, 'r', encoding='utf-8') as f:
+            content = f.read()
+            
+        # Neue Events hinzufügen
+        if 'events' in kdy_config:
+            for event_name, event_config in kdy_config['events'].items():
+                content = self.add_or_update_event(content, event_name, event_config)
+                
+        # Datei speichern
+        with open(self.ship_market_adjustments, 'w', encoding='utf-8') as f:
+            f.write(content)
+        print(f"✅ {self.ship_market_adjustments.name} aktualisiert")
+
+    def extract_current_ship_values(self, content):
+        """Extrahiert aktuelle Schiffswerte aus der Lua-Datei"""
+        ships = {}
+        
+        # Suche nach Schiff-Einträgen
+        ship_pattern = r'\["([^"]+)"\]\s*=\s*\{[^}]*chance\s*=\s*(\d+)[^}]*locked\s*=\s*(true|false)'
+        matches = re.findall(ship_pattern, content, re.DOTALL)
+        
+        for ship_name, chance, locked in matches:
+            ships[ship_name] = {
+                'chance': int(chance),
+                'locked': locked == 'true'
+            }
+            
+        return ships
+
+    def update_ship_market_entry(self, content, ship_name, ship_config):
+        """Aktualisiert einen Schiff-Eintrag in der Lua-Datei"""
+        
+        # Erstelle den neuen Eintrag
+        new_entry = f'''				["{ship_name}"] = {{
+					locked = {str(ship_config.get('locked', False)).lower()},
+					gc_locked = false,
+					amount = 0,
+					chance = {ship_config.get('chance', 0)},
+					perception_modifier = nil,
+					association = nil,
+					readable_name = "{ship_config.get('readable_name', ship_name)}",
+					text_requirement = "{ship_config.get('requirement_text', '')}",
+					order = {ship_config.get('order', 1)},
+				}},'''
+        
+        # Suche nach existierendem Eintrag und ersetze ihn
+        pattern = rf'\["{re.escape(ship_name)}"\]\s*=\s*\{{[^}}]+\}},'
+        if re.search(pattern, content, re.DOTALL):
+            content = re.sub(pattern, new_entry, content, flags=re.DOTALL)
+        else:
+            # Füge neuen Eintrag hinzu (vor dem schließenden })
+            content = re.sub(r'(\s*),\s*\}', f',\n{new_entry}\n			}}', content)
+            
+        return content
+
+    def add_or_update_event(self, content, event_name, event_config):
+        """Fügt ein neues Event hinzu oder aktualisiert ein existierendes"""
+        
+        # Erstelle den neuen Event-Eintrag
+        event_entry = f'''		["{event_name}"] = {{'''
+        
+        if 'adjustments' in event_config:
+            event_entry += f'''
+			adjustment_lists = {{'''
+            for ship, adjustment in event_config['adjustments'].items():
+                event_entry += f'''
+				{{"EMPIRE", "KDY_MARKET", "{ship}", {adjustment}}},'''
+            event_entry += '''
+			},'''
+            
+        if 'locks' in event_config:
+            event_entry += f'''
+			lock_lists = {{'''
+            for ship, locked in event_config['locks'].items():
+                event_entry += f'''
+				{{"EMPIRE", "KDY_MARKET", "{ship}", {str(locked).lower()}}},'''
+            event_entry += '''
+			},'''
+            
+        if 'unlocks' in event_config:
+            if 'lock_lists' not in event_config:
+                event_entry += f'''
+			lock_lists = {{'''
+            for ship, unlocked in event_config['unlocks'].items():
+                event_entry += f'''
+				{{"EMPIRE", "KDY_MARKET", "{ship}", {str(not unlocked).lower()}}},'''
+            event_entry += '''
+			},'''
+            
+        if 'requirements' in event_config:
+            event_entry += f'''
+			requirement_lists = {{'''
+            for ship, requirement in event_config['requirements'].items():
+                event_entry += f'''
+				{{"EMPIRE", "KDY_MARKET", "{ship}", "{requirement}"}},'''
+            event_entry += '''
+			},'''
+            
+        event_entry += '''
+		},'''
+        
+        # Suche nach existierendem Event und ersetze es
+        pattern = rf'\["{re.escape(event_name)}"\]\s*=\s*\{{[^}}]+\}},'
+        if re.search(pattern, content, re.DOTALL):
+            content = re.sub(pattern, event_entry, content, flags=re.DOTALL)
+        else:
+            # Füge neues Event hinzu (vor dem schließenden })
+            content = re.sub(r'(\s*)\}', f'{event_entry}\n}}', content)
+            
+        return content
+
 
 def main():
     """Hauptfunktion"""

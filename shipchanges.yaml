@@ -4,8 +4,76 @@
 # SWMA Tool Konfiguration
 game_mode: skirmish
 
-units:
+# KDY Markt-Konfiguration
+kdy_market:
+  enabled: true
+  
+  # Aktuelle Schiffswerte (unverändert)
+  ships:
+    PROCURATOR_BATTLECRUISER:
+      chance: 60
+      locked: false
+      readable_name: "Procurator Battlecruiser"
+      requirement_text: ""
+      order: 1
+      
+    PRAETOR_I_BATTLECRUISER:
+      chance: 35
+      locked: false
+      readable_name: "Praetor I Battlecruiser"
+      requirement_text: ""
+      order: 2
+      
+    ACCLAMATOR_DESTROYER:
+      chance: 50
+      locked: false
+      readable_name: "Acclamator Destroyer"
+      requirement_text: "[ Requires start in 22 BBY or later ]"
+      order: 3
+      
+    ACCLAMATOR_BATTLESHIP:
+      chance: 50
+      locked: false
+      readable_name: "Acclamator Battleship"
+      requirement_text: "[ Requires start in 22 BBY or later ]"
+      order: 4
+      
+    MAELSTROM_BATTLECRUISER:
+      chance: 70
+      locked: false
+      readable_name: "Maelstrom Battlecruiser"
+      requirement_text: "[ Requires Venator research; reduces Procurator chance by -2%; no more added after KDY Contract ]"
+      order: 5
+      
+    SECUTOR_STAR_DESTROYER:
+      chance: 35
+      locked: false
+      readable_name: "Secutor Star Destroyer"
+      requirement_text: "[ Requires Order 66 and KDY Contract ]"
+      order: 6
+      
+    TECTOR_STAR_DESTROYER:
+      chance: 1
+      locked: false
+      readable_name: "Tector Star Destroyer"
+      requirement_text: "[ Requires Order 66 and KDY Contract ]"
+      order: 7
+      
+    IMPERATOR_STAR_DESTROYER:
+      chance: 1
+      locked: false
+      readable_name: "Imperator Star Destroyer"
+      requirement_text: "[ Requires Order 66 and KDY Contract ]"
+      order: 8
+      
+    IMPERATOR_STAR_DESTROYER_ASSAULT:
+      chance: 1
+      locked: false
+      readable_name: "Imperator Star Destroyer Assault Refit"
+      requirement_text: "[ Requires Order 66 and KDY Contract ]"
+      order: 9
 
+units:
   Acclamator_I_Carrier:
     template: Template_Acclamator_I_Carrier
     base_unit: Skirmish_Acclamator_I_Carrier

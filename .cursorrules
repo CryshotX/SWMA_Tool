@@ -198,6 +198,44 @@ units:
 - `damage_increase`: Schadenserhöhung (z.B. `+200%`)
 - `burst_delay_adjustment`: Salven-Verzögerung (z.B. `-25%`)
 
+#### **KDY Markt-Konfiguration**
+
+**Globale Einstellungen:**
+
+- `enabled`: Aktiviert/deaktiviert KDY Markt-Verarbeitung (Standard: `true`)
+
+**Schiff-Konfiguration:**
+
+- `chance`: Wahrscheinlichkeit (0-100) für das Erscheinen pro Zyklus
+- `locked`: Verfügbar/gesperrt (`true`/`false`)
+- `readable_name`: Anzeigename im Spiel
+- `requirement_text`: Anforderungstext für den Spieler
+- `order`: Sortierreihenfolge
+
+**Event-Konfiguration:**
+
+- `adjustments`: Chance-Anpassungen für bestimmte Ereignisse
+- `locks`: Schiffe sperren/entsperren bei Ereignissen
+- `unlocks`: Schiffe bei Ereignissen freischalten
+- `requirements`: Anforderungstexte bei Ereignissen
+
+**Beispiel:**
+
+```yaml
+kdy_market:
+  enabled: true
+  ships:
+    PROCURATOR_BATTLECRUISER:
+      chance: 60 # Erhöht von 40 auf 60
+      locked: false
+  events:
+    CUSTOM_EVENT:
+      adjustments:
+        PROCURATOR_BATTLECRUISER: -20 # Reduziert um 20%
+      unlocks:
+        MAELSTROM_BATTLECRUISER: true # Macht verfügbar
+```
+
 #### **Squadron Types**
 
 **Republik/Jedi Squadron-Typen:**
@@ -456,8 +494,42 @@ Bei Problemen bitte folgende Informationen bereitstellen:
 
 Neue Features können über GitHub Issues vorgeschlagen werden.
 
+## 🔄 Cursor Rules Synchronisation
+
+### ⚠️ WICHTIG: Doppelte .cursorrules Dateien
+
+Dieses Projekt verwendet **zwei identische .cursorrules Dateien**:
+
+1. **Stammverzeichnis**: `/.cursorrules` (für Cursor AI Erkennung)
+2. **Tool-Verzeichnis**: `/XML/SWMA_Tool/.cursorrules` (Original)
+
+### 🔄 Synchronisationsregeln
+
+**BEI JEDER ÄNDERUNG** an der Projektdokumentation oder den Cursor Rules:
+
+1. **Beide Dateien aktualisieren** - Stammverzeichnis UND Tool-Verzeichnis
+2. **Identischen Inhalt sicherstellen** - Keine Unterschiede zwischen den Dateien
+3. **Version und Datum synchronisieren** - Immer beide Dateien gleichzeitig aktualisieren
+
+### 📝 Workflow für Änderungen
+
+```bash
+# 1. Änderungen in XML/SWMA_Tool/.cursorrules vornehmen
+# 2. Kopieren ins Stammverzeichnis
+cp XML/SWMA_Tool/.cursorrules .cursorrules
+# 3. Oder umgekehrt: Änderungen im Stammverzeichnis, dann ins Tool-Verzeichnis
+cp .cursorrules XML/SWMA_Tool/.cursorrules
+```
+
+### 🎯 Warum diese Struktur?
+
+- **Cursor AI**: Erkennt nur .cursorrules im Stammverzeichnis
+- **Projektorganisation**: Tool-spezifische Regeln gehören ins Tool-Verzeichnis
+- **Kompromiss**: Beide Anforderungen erfüllen durch Duplikation
+
 ---
 
-**Version**: 2.0  
-**Letzte Aktualisierung**: 2025-08-02  
-**Autor**: SWMA Tool Development Team
+**Version**: 2.1  
+**Letzte Aktualisierung**: 2025-01-27  
+**Autor**: SWMA Tool Development Team  
+**Synchronisation**: Beide .cursorrules Dateien identisch
