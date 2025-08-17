@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "SWMA Tool Konfiguration",
-  "description": "Schema für die SWMA Tool YAML-Konfigurationsdatei",
+  "description": "Schema für die SWMA Tool YAML-Konfigurationsdatei mit normaler Markt-Freischaltung",
   "type": "object",
   "properties": {
     "game_mode": {
@@ -28,6 +28,11 @@
             "campaign_unit": {
               "type": "string",
               "description": "Name der Campaign-Unit in Republic_Space_Units.xml"
+            },
+            "unlock_normal_market": {
+              "type": "boolean",
+              "description": "Schaltet das Schiff im normalen Baumarkt frei (Build_Initially_Locked auf No setzen)",
+              "default": false
             },
             "template_changes": {
               "type": "object",
