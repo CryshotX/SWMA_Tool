@@ -8,70 +8,105 @@ game_mode: skirmish
 kdy_market:
   enabled: true
   
-  # Aktuelle Schiffswerte (unverändert)
+  # Korrigierte Schiffswerte für sofortige Verfügbarkeit
   ships:
     PROCURATOR_BATTLECRUISER:
-      chance: 60
+      chance: 1000  # 100% pro Woche (garantiert)
       locked: false
       readable_name: "Procurator Battlecruiser"
       requirement_text: ""
       order: 1
+      amount: 0  # Startet mit 0 - wird wöchentlich hinzugefügt
       
     PRAETOR_I_BATTLECRUISER:
-      chance: 35
+      chance: 1000  # 100% pro Woche (garantiert)
       locked: false
       readable_name: "Praetor I Battlecruiser"
       requirement_text: ""
       order: 2
+      amount: 0  # Startet mit 0 - wird wöchentlich hinzugefügt
       
     ACCLAMATOR_DESTROYER:
-      chance: 50
+      chance: 1000  # 100% pro Woche (garantiert)
       locked: false
       readable_name: "Acclamator Destroyer"
       requirement_text: "[ Requires start in 22 BBY or later ]"
       order: 3
+      amount: 0  # Startet mit 0 - wird wöchentlich hinzugefügt
       
     ACCLAMATOR_BATTLESHIP:
-      chance: 50
+      chance: 1000  # 100% pro Woche (garantiert)
       locked: false
       readable_name: "Acclamator Battleship"
       requirement_text: "[ Requires start in 22 BBY or later ]"
       order: 4
+      amount: 0  # Startet mit 0 - wird wöchentlich hinzugefügt
       
     MAELSTROM_BATTLECRUISER:
-      chance: 70
+      chance: 1000  # 100% pro Woche (garantiert)
       locked: false
       readable_name: "Maelstrom Battlecruiser"
       requirement_text: "[ Requires Venator research; reduces Procurator chance by -2%; no more added after KDY Contract ]"
       order: 5
+      amount: 0  # Startet mit 0 - wird wöchentlich hinzugefügt
       
     SECUTOR_STAR_DESTROYER:
-      chance: 35
+      chance: 1000  # 100% pro Woche (garantiert)
       locked: false
       readable_name: "Secutor Star Destroyer"
       requirement_text: "[ Requires Order 66 and KDY Contract ]"
       order: 6
+      amount: 0  # Startet mit 0 - wird wöchentlich hinzugefügt
       
     TECTOR_STAR_DESTROYER:
-      chance: 1
+      chance: 1000  # 100% pro Woche (garantiert)
       locked: false
       readable_name: "Tector Star Destroyer"
       requirement_text: "[ Requires Order 66 and KDY Contract ]"
       order: 7
+      amount: 0  # Startet mit 0 - wird wöchentlich hinzugefügt
       
     IMPERATOR_STAR_DESTROYER:
-      chance: 1
+      chance: 1000  # 100% pro Woche (garantiert)
       locked: false
       readable_name: "Imperator Star Destroyer"
       requirement_text: "[ Requires Order 66 and KDY Contract ]"
       order: 8
+      amount: 0  # Startet mit 0 - wird wöchentlich hinzugefügt
       
     IMPERATOR_STAR_DESTROYER_ASSAULT:
-      chance: 1
+      chance: 1000  # 100% pro Woche (garantiert)
       locked: false
       readable_name: "Imperator Star Destroyer Assault Refit"
       requirement_text: "[ Requires Order 66 and KDY Contract ]"
       order: 9
+      amount: 0  # Startet mit 0 - wird wöchentlich hinzugefügt
+      
+  # Event-basierte Anpassungen (deaktiviert für höhere Verfügbarkeit)
+  events:
+    # VENATOR_RESEARCH:
+    #   adjustments:
+    #     PROCURATOR_BATTLECRUISER: -200  # Reduziert von 950 auf 750 (-20% * 10)
+    KDY_CONTRACT:
+      locks:
+        PROCURATOR_BATTLECRUISER: true  # Sperrt nach KDY Contract
+        MAELSTROM_BATTLECRUISER: true   # Sperrt nach KDY Contract
+      unlocks:
+        SECUTOR_STAR_DESTROYER: true
+        TECTOR_STAR_DESTROYER: true
+        IMPERATOR_STAR_DESTROYER: true
+        IMPERATOR_STAR_DESTROYER_ASSAULT: true
+    # MALEVOLENCE:
+    #   adjustments:
+    #     MAELSTROM_BATTLECRUISER: 200  # +200 auf Basis-Wert (980 + 200 = 1180)
+    #   locks:
+    #     PROCURATOR_BATTLECRUISER: true
+    #     PRAETOR_I_BATTLECRUISER: true
+    # RIMWARD:
+    #   adjustments:
+    #     MAELSTROM_BATTLECRUISER: 600  # +600 auf Basis-Wert (980 + 600 = 1580)
+    #   locks:
+    #     PROCURATOR_BATTLECRUISER: true
 
 units:
   Acclamator_I_Carrier:

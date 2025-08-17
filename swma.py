@@ -1449,16 +1449,16 @@ class SWModdingTool:
         
         # Erstelle den neuen Eintrag
         new_entry = f'''				["{ship_name}"] = {{
-					locked = {str(ship_config.get('locked', False)).lower()},
-					gc_locked = false,
-					amount = 0,
-					chance = {ship_config.get('chance', 0)},
-					perception_modifier = nil,
-					association = nil,
-					readable_name = "{ship_config.get('readable_name', ship_name)}",
-					text_requirement = "{ship_config.get('requirement_text', '')}",
-					order = {ship_config.get('order', 1)},
-				}},'''
+                   locked = {str(ship_config.get('locked', False)).lower()},
+                   gc_locked = false,
+                   amount = {ship_config.get('amount', 0)},
+                   chance = {ship_config.get('chance', 0)},
+                   perception_modifier = nil,
+                   association = nil,
+                   readable_name = "{ship_config.get('readable_name', ship_name)}",
+                   text_requirement = "{ship_config.get('requirement_text', '')}",
+                   order = {ship_config.get('order', 1)},
+               }},'''
         
         # Suche nach existierendem Eintrag und ersetze ihn
         pattern = rf'\["{re.escape(ship_name)}"\]\s*=\s*\{{[^}}]+\}},'
@@ -1474,55 +1474,51 @@ class SWModdingTool:
         """Fügt ein neues Event hinzu oder aktualisiert ein existierendes"""
         
         # Erstelle den neuen Event-Eintrag
-        event_entry = f'''		["{event_name}"] = {{'''
+        event_entry = f'\t["{event_name}"] = {{\n'
         
-        if 'adjustments' in event_config:
-            event_entry += f'''
-			adjustment_lists = {{'''
-            for ship, adjustment in event_config['adjustments'].items():
-                event_entry += f'''
-				{{"EMPIRE", "KDY_MARKET", "{ship}", {adjustment}}},'''
-            event_entry += '''
-			},'''
-            
+        # Alle lock_lists sammeln (locks + unlocks)
+        all_locks = []
         if 'locks' in event_config:
-            event_entry += f'''
-			lock_lists = {{'''
             for ship, locked in event_config['locks'].items():
-                event_entry += f'''
-				{{"EMPIRE", "KDY_MARKET", "{ship}", {str(locked).lower()}}},'''
-            event_entry += '''
-			},'''
-            
+                all_locks.append(f'\t\t{{"EMPIRE", "KDY_MARKET", "{ship}", {str(locked).lower()}}}')
+                
         if 'unlocks' in event_config:
-            if 'lock_lists' not in event_config:
-                event_entry += f'''
-			lock_lists = {{'''
             for ship, unlocked in event_config['unlocks'].items():
-                event_entry += f'''
-				{{"EMPIRE", "KDY_MARKET", "{ship}", {str(not unlocked).lower()}}},'''
-            event_entry += '''
-			},'''
+                all_locks.append(f'\t\t{{"EMPIRE", "KDY_MARKET", "{ship}", {str(not unlocked).lower()}}}')
+        
+        # lock_lists hinzufügen wenn vorhanden
+        if all_locks:
+            event_entry += '\t\tlock_lists = {\n'
+            event_entry += ',\n'.join(all_locks) + '\n'
+            event_entry += '\t\t},\n'
             
+        # adjustment_lists hinzufügen wenn vorhanden
+        if 'adjustments' in event_config:
+            event_entry += '\t\tadjustment_lists = {\n'
+            adjustments = []
+            for ship, adjustment in event_config['adjustments'].items():
+                adjustments.append(f'\t\t\t{{"EMPIRE", "KDY_MARKET", "{ship}", {adjustment}}}')
+            event_entry += ',\n'.join(adjustments) + '\n'
+            event_entry += '\t\t},\n'
+            
+        # requirement_lists hinzufügen wenn vorhanden
         if 'requirements' in event_config:
-            event_entry += f'''
-			requirement_lists = {{'''
+            event_entry += '\t\trequirement_lists = {\n'
+            requirements = []
             for ship, requirement in event_config['requirements'].items():
-                event_entry += f'''
-				{{"EMPIRE", "KDY_MARKET", "{ship}", "{requirement}"}},'''
-            event_entry += '''
-			},'''
+                requirements.append(f'\t\t\t{{"EMPIRE", "KDY_MARKET", "{ship}", "{requirement}"}}')
+            event_entry += ',\n'.join(requirements) + '\n'
+            event_entry += '\t\t},\n'
             
-        event_entry += '''
-		},'''
+        event_entry += '\t},'
         
         # Suche nach existierendem Event und ersetze es
-        pattern = rf'\["{re.escape(event_name)}"\]\s*=\s*\{{[^}}]+\}},'
+        pattern = rf'\["{re.escape(event_name)}"\]\s*=\s*\{{[^{{}}]*(?:\{{[^{{}}]*\}}[^{{}}]*)*\}},'
         if re.search(pattern, content, re.DOTALL):
             content = re.sub(pattern, event_entry, content, flags=re.DOTALL)
         else:
-            # Füge neues Event hinzu (vor dem schließenden })
-            content = re.sub(r'(\s*)\}', f'{event_entry}\n}}', content)
+            # Füge neues Event hinzu (vor dem letzten })
+            content = re.sub(r'\s*\}\s*$', f'\n{event_entry}\n}}', content)
             
         return content
 
