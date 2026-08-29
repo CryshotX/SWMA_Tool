@@ -274,6 +274,8 @@ class SWModdingTool:
         self.text_base_dir = self.xml_base_dir.parent / "Text"
         # Merker: Wurden Text/Tooltip-Dateien geändert?
         self.text_changes_applied: bool = False
+        # Cache für Squadron-Klassifizierung (Name -> (Variant_Of_Existing_Type, Is_Bomber))
+        self._squadron_class_cache = None
         
     def load_config(self) -> Dict[str, Any]:
         """Lädt die Konfigurationsdatei"""
@@ -854,6 +856,7 @@ class SWModdingTool:
             # Squadron-Änderungen (mit intelligenter Datei-Auswahl)
             if 'squadrons' in unit_config:
                 self.apply_squadron_changes(unit_config, target_files['squadrons'])
+                self.update_squadron_tooltip_for_unit(unit_config)
             
             # Hardpoint-Änderungen
             if 'hardpoints' in unit_config:
@@ -1138,34 +1141,71 @@ class SWModdingTool:
 
     # -------- Tooltip/Text-Update-Funktionen --------
     def get_encyclopedia_text_keys(self, unit_config: Dict[str, Any]) -> List[str]:
-        """Extrahiert alle TEXT_* Keys aus <Encyclopedia_Text> für die Einheit aus Campaign und Skirmish."""
-        unit_name = unit_config.get('campaign_unit') or unit_config.get('base_unit')
-        if not unit_name:
-            return []
-        files_to_check = [
-            str(self.xml_base_dir / "Units/Republic_Space_Units.xml"),
-            str(self.xml_base_dir / "Units/Skirmish/SkirmishUnits_Republic.xml"),
-        ]
+        """Extrahiert alle TEXT_* Keys aus <Encyclopedia_Text> der Einheit
+        aus Campaign, Skirmish und dem zugehörigen Template."""
         seen = set()
         ordered_keys: List[str] = []
-        for file_path in files_to_check:
-            try:
-                tree = self.xml_processor.load_xml(file_path)
-                unit_element = self.xml_processor.find_unit_element(tree, unit_name)
-                if unit_element is None:
+
+        template_files = [
+            str(self.xml_base_dir / "Units/Templates_Frigates.xml"),
+            str(self.xml_base_dir / "Units/Templates_Capitals.xml"),
+        ]
+
+        def collect(element: ET.Element) -> None:
+            if element is None:
+                return
+            enc_el = element.find('Encyclopedia_Text')
+            if enc_el is None:
+                return
+            text_blob = ''.join(list(enc_el.itertext()))
+            tokens = re.split(r"\s+|,", text_blob.strip())
+            for t in tokens:
+                if t and t.startswith('TEXT_') and t not in seen:
+                    seen.add(t)
+                    ordered_keys.append(t)
+
+        def collect_template(template_name: str) -> None:
+            if not template_name:
+                return
+            for file_path in template_files:
+                try:
+                    tree = self.xml_processor.load_xml(file_path)
+                    collect(self.xml_processor.find_template_element(tree, template_name))
+                except Exception:
                     continue
-                enc_el = unit_element.find('Encyclopedia_Text')
-                if enc_el is None:
+
+        def collect_element_and_template(element: ET.Element) -> None:
+            if element is None:
+                return
+            # Eigenes <Encyclopedia_Text> hat Vorrang vor dem Template
+            if element.find('Encyclopedia_Text') is not None:
+                collect(element)
+                return
+            # Kein eigenes <Encyclopedia_Text> -> Template-Verweis folgen
+            variant_el = element.find('Variant_Of_Existing_Type')
+            if variant_el is not None and variant_el.text:
+                variant = variant_el.text.strip()
+                if variant.startswith('Template_'):
+                    collect_template(variant)
+
+        # 1) Campaign- und Skirmish-Unit (inkl. Template-Verweis)
+        unit_name = unit_config.get('campaign_unit') or unit_config.get('base_unit')
+        if unit_name:
+            unit_files = [
+                str(self.xml_base_dir / "Units/Republic_Space_Units.xml"),
+                str(self.xml_base_dir / "Units/Skirmish/SkirmishUnits_Republic.xml"),
+            ]
+            for file_path in unit_files:
+                try:
+                    tree = self.xml_processor.load_xml(file_path)
+                    collect_element_and_template(self.xml_processor.find_unit_element(tree, unit_name))
+                except Exception:
                     continue
-                text_blob = ''.join(list(enc_el.itertext()))
-                tokens = re.split(r"\s+|,", text_blob.strip())
-                keys = [t for t in tokens if t and t.startswith('TEXT_')]
-                for k in keys:
-                    if k not in seen:
-                        seen.add(k)
-                        ordered_keys.append(k)
-            except Exception:
-                continue
+
+        # 2) Fallback: explizit konfiguriertes Template, falls bisher nichts gefunden
+        if not ordered_keys:
+            collect_template(unit_config.get('template'))
+
         return ordered_keys
 
     def find_text_file_containing_key(self, key: str) -> Optional[Path]:
@@ -1266,6 +1306,223 @@ class SWModdingTool:
                 print(f"  Warnung: Konnte Datei nicht schreiben: {txt_path} ({e})")
                 return False
             # Globales Flag setzen
+            self.text_changes_applied = True
+        return changed
+
+    # -------- Squadron-Klassifizierung & Squadron-Text-Updates --------
+    def _squadron_classification_map(self) -> Dict[str, Tuple[Optional[str], Optional[bool]]]:
+        """Lädt einmalig alle Squadron-Definitionen und mappt
+        Name -> (Variant_Of_Existing_Type, Is_Bomber)."""
+        if self._squadron_class_cache is not None:
+            return self._squadron_class_cache
+
+        cache: Dict[str, Tuple[Optional[str], Optional[bool]]] = {}
+
+        def parse_bool(text: Optional[str]) -> Optional[bool]:
+            if text is None:
+                return None
+            value = text.strip().lower()
+            if value in ('yes', 'true', '1'):
+                return True
+            if value in ('no', 'false', '0'):
+                return False
+            return None
+
+        squadron_files = [
+            "Units/Templates_Fighters.xml",
+            "Units/Templates_Capitals.xml",
+            "Units/Templates_Frigates.xml",
+            "Units/Republic_Space_Units.xml",
+            "Units/CIS_Space_Units.xml",
+            "Units/Hutt_Space_Units.xml",
+            "Units/Other_Space_Units.xml",
+            "Units/Skirmish/SkirmishUnits_Republic.xml",
+            "Units/Skirmish/SkirmishUnits_CIS.xml",
+            "Units/Skirmish/SkirmishUnits_Hutt.xml",
+        ]
+
+        for rel in squadron_files:
+            file_path = self.xml_base_dir / rel
+            if not file_path.exists():
+                continue
+            try:
+                tree = self.xml_processor.load_xml(str(file_path))
+            except Exception:
+                continue
+            for element in tree.getroot().iter():
+                if not element.tag.endswith('Squadron'):
+                    continue
+                name = element.get('Name')
+                if not name or name in cache:
+                    continue
+                variant_el = element.find('Variant_Of_Existing_Type')
+                variant = variant_el.text.strip() if (variant_el is not None and variant_el.text) else None
+                bomber_el = element.find('Is_Bomber')
+                is_bomber = parse_bool(bomber_el.text) if bomber_el is not None else None
+                cache[name] = (variant, is_bomber)
+
+        self._squadron_class_cache = cache
+        return cache
+
+    def resolve_squadron_is_bomber(self, squadron_type: str) -> Optional[bool]:
+        """Bestimmt, ob ein Squadron-Typ ein Bomber ist (True/False) oder None,
+        wenn keine Zuordnung gefunden werden konnte."""
+        mapping = self._squadron_classification_map()
+        current = squadron_type
+        visited = set()
+        while current and current not in visited:
+            visited.add(current)
+            entry = mapping.get(current)
+            if entry is None:
+                return None
+            variant, is_bomber = entry
+            if is_bomber is not None:
+                return is_bomber
+            if not variant:
+                return None
+            current = variant
+        return None
+
+    def compute_squadron_tooltip_counts(self, unit_config: Dict[str, Any]) -> Dict[str, int]:
+        """Summiert die konfigurierten Squadrons getrennt nach Fighter/Bomber
+        für 'starting' (gleichzeitig deploybar) und 'reserve' (Reserve)."""
+        result = {
+            'fighters_starting': 0,
+            'fighters_reserve': 0,
+            'bombers_starting': 0,
+            'bombers_reserve': 0,
+        }
+        squadron_config = unit_config.get('squadrons')
+        if not squadron_config:
+            return result
+
+        def sum_counts(entries: List[Dict[str, Any]]) -> Tuple[int, int]:
+            fighters = 0
+            bombers = 0
+            for squadron in entries:
+                squadron_type = squadron.get('type')
+                count = int(squadron.get('count', 0))
+                is_bomber = self.resolve_squadron_is_bomber(squadron_type) if squadron_type else None
+                if is_bomber is True:
+                    bombers += count
+                else:
+                    if is_bomber is None and squadron_type:
+                        print(f"  Hinweis: Squadron-Typ '{squadron_type}' nicht klassifizierbar, zähle als Fighter")
+                    fighters += count
+            return fighters, bombers
+
+        starting = squadron_config.get('starting')
+        if starting:
+            first_tech_level = list(starting.keys())[0]
+            result['fighters_starting'], result['bombers_starting'] = sum_counts(starting[first_tech_level])
+
+        reserve = squadron_config.get('reserve')
+        if reserve:
+            first_tech_level = list(reserve.keys())[0]
+            result['fighters_reserve'], result['bombers_reserve'] = sum_counts(reserve[first_tech_level])
+
+        return result
+
+    def update_squadron_tooltip_for_unit(self, unit_config: Dict[str, Any]) -> None:
+        """Aktualisiert die Squadron-Statustexte (Fighters/Bombers) einer Einheit."""
+        if 'squadrons' not in unit_config:
+            return
+
+        counts = self.compute_squadron_tooltip_counts(unit_config)
+        keys = self.get_encyclopedia_text_keys(unit_config)
+        if not keys:
+            return
+
+        squadron_keys = [k for k in keys if '_SQUADRON' in k.upper()]
+        if not squadron_keys:
+            return
+
+        for key in squadron_keys:
+            txt_path = self.find_text_file_containing_key(key)
+            if not txt_path:
+                print(f"  Hinweis: Kein Textfile für {key} gefunden")
+                continue
+            self.update_squadron_text_line_in_file(txt_path, key, counts)
+
+    def update_squadron_text_line_in_file(self, txt_path: Path, key: str, counts: Dict[str, int]) -> bool:
+        """Aktualisiert die 'Fighters: X / Y'- und 'Bombers: X / Y'-Anteile einer Squadron-Textzeile."""
+        try:
+            with open(txt_path, 'r', encoding='utf-8') as f:
+                lines = f.readlines()
+        except Exception as e:
+            print(f"  Warnung: Konnte Datei nicht lesen: {txt_path} ({e})")
+            return False
+
+        def fmt(value: int) -> str:
+            number = float(value)
+            return str(int(number)) if number.is_integer() else str(number)
+
+        def replace_segment(value: str, label: str, starting: int, reserve: int) -> str:
+            pattern = re.compile(
+                rf"({label}:\s*)[0-9]+(?:\.[0-9]+)?\s*/\s*[0-9]+(?:\.[0-9]+)?"
+            )
+            return pattern.sub(
+                lambda m: f"{m.group(1)}{fmt(starting)} / {fmt(reserve)}", value
+            )
+
+        changed = False
+        for i, line in enumerate(lines):
+            if not line.startswith(f"{key},"):
+                continue
+            prefix, value = line.split(',', 1)
+            new_value = value.rstrip('\n')
+
+            new_value = replace_segment(
+                new_value, 'Fighters', counts['fighters_starting'], counts['fighters_reserve']
+            )
+
+            has_bombers = counts['bombers_starting'] > 0 or counts['bombers_reserve'] > 0
+            if has_bombers:
+                new_value = replace_segment(
+                    new_value, 'Bombers', counts['bombers_starting'], counts['bombers_reserve']
+                )
+                # Falls noch kein Bomber-Segment vorhanden ist, eines ergänzen
+                if not re.search(r"Bombers:\s*[0-9]", new_value):
+                    bomber_segment = (
+                        f"Bombers: {fmt(counts['bombers_starting'])} / {fmt(counts['bombers_reserve'])}"
+                    )
+                    suffix_match = re.search(r"\s*\[[^\]]*\]\s*$", new_value)
+                    if suffix_match:
+                        pos = suffix_match.start()
+                        new_value = new_value[:pos].rstrip() + " | " + bomber_segment + " " + new_value[pos:].lstrip()
+                    else:
+                        new_value = new_value.rstrip() + " | " + bomber_segment
+            else:
+                # Vorhandenes Bomber-Segment entfernen (inkl. zugehörigem Separator)
+                new_value = re.sub(
+                    r"\s*\|\s*Bombers:\s*[0-9]+(?:\.[0-9]+)?\s*/\s*[0-9]+(?:\.[0-9]+)?",
+                    "",
+                    new_value,
+                )
+                new_value = re.sub(
+                    r"Bombers:\s*[0-9]+(?:\.[0-9]+)?\s*/\s*[0-9]+(?:\.[0-9]+)?\s*\|\s*",
+                    "",
+                    new_value,
+                )
+
+            if new_value != value.rstrip('\n'):
+                try:
+                    if self.backup_manager:
+                        self.backup_manager.create_backup(str(txt_path))
+                except Exception:
+                    pass
+                lines[i] = f"{prefix},{new_value}\n"
+                changed = True
+                print(f"  Squadron-Tooltip aktualisiert: {key} -> {new_value}")
+                break
+
+        if changed:
+            try:
+                with open(txt_path, 'w', encoding='utf-8') as f:
+                    f.writelines(lines)
+            except Exception as e:
+                print(f"  Warnung: Konnte Datei nicht schreiben: {txt_path} ({e})")
+                return False
             self.text_changes_applied = True
         return changed
 

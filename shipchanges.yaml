@@ -10,52 +10,50 @@ units:
     base_unit: Skirmish_Acclamator_I_Carrier
     campaign_unit: Acclamator_I_Carrier
     template_changes:
-      shield_points: +20%
-      shield_refresh_rate: +20%
-      population_value: 10
+      shield_points: +0%
+      shield_refresh_rate: +0%
+    hardpoints:
+      damage_increase: +0%
     squadrons:
       delay_seconds: 5
-      
       starting:
         0:
           - type: Clone_ARC_170_Squadron
-            count: 1
+            count: 3
           - type: NTB_630_Squadron
-            count: 1
+            count: 3
       reserve:
         0:
           - type: Clone_ARC_170_Squadron
-            count: 4
+            count: 12
           - type:  NTB_630_Squadron
-            count: 4
+            count: 12
 
   Acclamator_II:
     template: Template_Acclamator_II
     base_unit: Skirmish_Acclamator_II
     campaign_unit: Acclamator_II
     template_changes:
-      shield_points: +10%
-      energy_refresh_rate: +20%
-      population_value: 10
+      shield_points: +0%
+      energy_refresh_rate: +0%
     hardpoints:
-      damage_increase: +20%
+      damage_increase: +0%
 
   Venator:
     template: Template_Venator_Star_Destroyer
     base_unit: Skirmish_Venator_Star_Destroyer
     campaign_unit: Venator_Star_Destroyer
     template_changes:
-      shield_refresh_rate: +100%
+      shield_refresh_rate: +200%
       shield_points: +50%
-      population_value: 10
     squadrons:
       delay_seconds: 1
       starting:
         0:
           - type: Clone_ARC_170_Squadron
-            count: 2
+            count: 1
           - type: Clone_Nimbus_V_Wing_Squadron
-            count: 2
+            count: 1
           - type: NTB_630_Squadron
             count: 2
       reserve:
@@ -72,16 +70,15 @@ units:
     base_unit: Skirmish_Tector_Star_Destroyer
     campaign_unit: Tector_Star_Destroyer
     hardpoints:
-      fire_rate_increase: +40%
-      damage_increase: +300%
-      burst_delay_adjustment: -50%
+      fire_rate_increase: +0%
+      damage_increase: +0%
+      burst_delay_adjustment: +0%
     template_changes:
-      shield_refresh_rate: +100%
-      shield_points: -20%
-      population_value: 10
-      energy_refresh_rate: +100%
+      shield_refresh_rate: +0%
+      shield_points: +0%
+      energy_refresh_rate: +0%
     cost_changes:
-      Tactical_Build_Cost_Multiplayer: +60%
+      Tactical_Build_Cost_Multiplayer: +0%
     squadrons:
       delay_seconds: 10
       starting:
@@ -104,9 +101,9 @@ units:
       starting:
         0:
           - type: Clone_ARC_170_Squadron
-            count: 2
+            count: 1
           - type: Clone_Nimbus_V_Wing_Squadron
-            count: 3
+            count: 1
       reserve:
         0:
           - type: Clone_ARC_170_Squadron
@@ -119,12 +116,11 @@ units:
     base_unit: Skirmish_Victory_I_Star_Destroyer
     campaign_unit: Victory_I_Star_Destroyer
     hardpoints:
-      fire_rate_increase: +30%
-      burst_delay_adjustment: -30%
+      fire_rate_increase: +0%
+      burst_delay_adjustment: +0%
     template_changes:
-      population_value: 10
-      shield_points: +30%
-      shield_refresh_rate: +30%
+      shield_points: +100%
+      shield_refresh_rate: +250%
     squadrons:
       delay_seconds: 15
       starting:
@@ -142,28 +138,27 @@ units:
     campaign_unit: Secutor_Star_Destroyer
     template_changes:
       shield_refresh_rate: +200%
-      energy_refresh_rate: +100%
       population_value: 10
     squadrons:
       delay_seconds: 2
       starting:
         0:
           - type: Clone_ARC_170_Squadron
-            count: 4
+            count: 1
           - type: Clone_Nimbus_V_Wing_Squadron
-            count: 4
-          - type: NTB_630_Squadron
             count: 2
+          - type: NTB_630_Squadron
+            count: 3
       reserve:
         0:
           - type: Clone_ARC_170_Squadron
-            count: 24
+            count: 4
           - type: Clone_Nimbus_V_Wing_Squadron
-            count: 24
+            count: 8
           - type: NTB_630_Squadron
-            count: 16
+            count: 12
     hardpoints:
-      damage_increase: +30%
+      damage_increase: +0%
   
   Maelstrom_Battlecruiser:
     template: Template_Maelstrom_Battlecruiser
