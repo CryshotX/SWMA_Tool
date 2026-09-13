@@ -23,8 +23,12 @@ class BackupManager:
     """Verwaltet Backups der Original-Dateien mit automatischer Wiederherstellung"""
     
     def __init__(self, backup_dir: str = "backups", xml_base_dir: Path = None):
-        self.backup_dir = Path(backup_dir)
-        self.backup_dir.mkdir(exist_ok=True)
+        default_root = Path(__file__).resolve().parent
+        candidate = Path(backup_dir)
+        if not candidate.is_absolute():
+            candidate = (default_root / candidate).resolve()
+        self.backup_dir = candidate
+        self.backup_dir.mkdir(parents=True, exist_ok=True)
         self.xml_base_dir = xml_base_dir
         
         # Liste aller relevanten Dateien für Backups
@@ -259,11 +263,95 @@ class XMLProcessor:
 class SWModdingTool:
     """Hauptklasse für das Star Wars Modding Automation Tool"""
     
+    def _looks_like_xml_root(self, candidate: Path) -> bool:
+        """Prüft, ob ein Pfad das tatsächliche XML-Root enthält."""
+        if not candidate.exists() or not candidate.is_dir():
+            return False
+
+        markers = [
+            candidate / "Units" / "Templates_Frigates.xml",
+            candidate / "Units" / "Templates_Capitals.xml",
+            candidate / "Units" / "Skirmish" / "SkirmishUnits_Republic.xml",
+            candidate / "Hardpoints" / "HardPoints_Coresaga_Frigates.xml",
+            candidate / "Hardpoints" / "HardPoints_Coresaga_Capitals.xml",
+        ]
+        return any(path.exists() for path in markers)
+
+    def _find_xml_base_dir(self) -> Path:
+        """Ermittelt das XML-Verzeichnis robust, unabhängig von Arbeitsverzeichnis und Installationsort."""
+        script_dir = Path(__file__).resolve().parent
+        preferred_root = Path(r"C:\Program Files (x86)\steam\steamapps\workshop\content\32470\1976399102\Data\XML")
+
+        candidate_roots = [
+            preferred_root,
+            preferred_root.parent,
+            script_dir,
+            *script_dir.parents,
+            script_dir / "Data" / "XML",
+            script_dir.parent / "Data" / "XML",
+            script_dir.parent.parent / "Data" / "XML",
+            script_dir / "XML",
+            script_dir.parent / "XML",
+        ]
+
+        # Vorzugsweise immer den tatsächlichen Workshop-XML-Ordner verwenden, falls vorhanden.
+        for candidate in candidate_roots:
+            if self._looks_like_xml_root(candidate):
+                return candidate.resolve()
+
+        # Fallback: Nach einem passendem XML-Root im aktuellen Arbeitsbaum suchen
+        search_roots = [
+            Path.cwd(),
+            script_dir,
+            *script_dir.parents,
+        ]
+        seen = set()
+        for root in search_roots:
+            if root in seen:
+                continue
+            seen.add(root)
+            if not root.exists():
+                continue
+            for path in root.rglob("Templates_Frigates.xml"):
+                candidate = path.parent.parent
+                if self._looks_like_xml_root(candidate):
+                    return candidate.resolve()
+            for path in root.rglob("HardPoints_Coresaga_Frigates.xml"):
+                candidate = path.parent.parent
+                if self._looks_like_xml_root(candidate):
+                    return candidate.resolve()
+
+        # Letzter Fallback: bisheriges Verhalten
+        fallback_base = preferred_root if preferred_root.exists() else script_dir.parent.resolve()
+        if self._looks_like_xml_root(fallback_base):
+            return fallback_base
+        return fallback_base
+
+    def _resolve_config_path(self, config_file: str) -> Path:
+        """Löst Konfigurationsdateien relativ zum aktuellen Arbeitsverzeichnis oder der App-Location auf."""
+        config_path = Path(config_file).expanduser()
+        if config_path.is_absolute():
+            return config_path.resolve()
+
+        search_roots = [
+            Path.cwd(),
+            Path(__file__).resolve().parent,
+            self._find_xml_base_dir(),
+            self._find_xml_base_dir().parent,
+        ]
+
+        for root in search_roots:
+            candidate = (root / config_path).resolve()
+            if candidate.exists():
+                return candidate
+
+        return (Path.cwd() / config_path).resolve()
+
     def __init__(self, config_file: str, backup_originals: bool = True):
-        self.config_file = config_file
+        self.config_file = str(self._resolve_config_path(config_file))
         
-        # XML-Verzeichnis ermitteln (übergeordnetes Verzeichnis)
-        self.xml_base_dir = Path(__file__).parent.parent
+        # XML-Verzeichnis robust ermitteln
+        self.xml_base_dir = self._find_xml_base_dir()
         
         # BackupManager mit XML-Basis-Verzeichnis initialisieren
         self.backup_manager = BackupManager(xml_base_dir=self.xml_base_dir) if backup_originals else None
@@ -280,7 +368,10 @@ class SWModdingTool:
     def load_config(self) -> Dict[str, Any]:
         """Lädt die Konfigurationsdatei"""
         try:
-            with open(self.config_file, 'r', encoding='utf-8') as f:
+            config_path = Path(self.config_file)
+            if not config_path.is_absolute():
+                config_path = self._resolve_config_path(str(config_path))
+            with open(config_path, 'r', encoding='utf-8') as f:
                 config = yaml.safe_load(f)
             return config
         except FileNotFoundError:
