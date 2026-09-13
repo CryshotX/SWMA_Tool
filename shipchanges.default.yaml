@@ -1,0 +1,116 @@
+# cursor: disable
+# yaml-language-server: $schema=./shipchanges.schema.json
+
+# SWMA Tool Default-Konfiguration
+# Alle Werte sind auf den neutralen Stand zurückgesetzt.
+game_mode: skirmish
+
+units:
+  Acclamator_I_Carrier:
+    template: Template_Acclamator_I_Carrier
+    base_unit: Skirmish_Acclamator_I_Carrier
+    campaign_unit: Acclamator_I_Carrier
+    template_changes:
+      shield_points: +0%
+      shield_refresh_rate: +0%
+    hardpoints:
+      damage_increase: +0%
+
+  Acclamator_II:
+    template: Template_Acclamator_II
+    base_unit: Skirmish_Acclamator_II
+    campaign_unit: Acclamator_II
+    template_changes:
+      shield_points: +0%
+      energy_refresh_rate: +0%
+    hardpoints:
+      damage_increase: +0%
+
+  Venator:
+    template: Template_Venator_Star_Destroyer
+    base_unit: Skirmish_Venator_Star_Destroyer
+    campaign_unit: Venator_Star_Destroyer
+    template_changes:
+      shield_refresh_rate: +0%
+      shield_points: +0%
+
+  Tector_Star_Destroyer:
+    template: Template_Tector_Star_Destroyer
+    base_unit: Skirmish_Tector_Star_Destroyer
+    campaign_unit: Tector_Star_Destroyer
+    hardpoints:
+      fire_rate_increase: +0%
+      damage_increase: +0%
+      burst_delay_adjustment: +0%
+    template_changes:
+      shield_refresh_rate: +0%
+      shield_points: +0%
+      energy_refresh_rate: +0%
+    cost_changes:
+      Tactical_Build_Cost_Multiplayer: +0%
+
+  Imperial_Star_Destroyer:
+    template: Template_Imperator_Star_Destroyer
+    base_unit: Skirmish_Imperator_Star_Destroyer
+    campaign_unit: Imperator_Star_Destroyer
+    template_changes:
+      population_value: 0
+
+  Victory_I:
+    template: Template_Victory_I_Star_Destroyer
+    base_unit: Skirmish_Victory_I_Star_Destroyer
+    campaign_unit: Victory_I_Star_Destroyer
+    hardpoints:
+      fire_rate_increase: +0%
+      burst_delay_adjustment: +0%
+    template_changes:
+      shield_points: +0%
+      shield_refresh_rate: +0%
+
+  Secutor:
+    template: Template_Secutor_Star_Destroyer
+    base_unit: Skirmish_Secutor_Star_Destroyer
+    campaign_unit: Secutor_Star_Destroyer
+    template_changes:
+      shield_refresh_rate: +0%
+      population_value: 0
+    hardpoints:
+      damage_increase: +0%
+
+  Maelstrom_Battlecruiser:
+    template: Template_Maelstrom_Battlecruiser
+    base_unit: Skirmish_Maelstrom_Battlecruiser
+    campaign_unit: Maelstrom_Battlecruiser
+    unlock_normal_market: false
+    template_changes:
+      shield_refresh_rate: +0%
+      shield_points: +0%
+      energy_refresh_rate: +0%
+      population_value: 0
+    hardpoints:
+      damage_increase: +0%
+      burst_delay_adjustment: +0%
+      fire_rate_increase: +0%
+
+  Praetor_I_Battlecruiser:
+    base_unit: Skirmish_Praetor_I_Battlecruiser
+    campaign_unit: Praetor_I_Battlecruiser
+    unlock_normal_market: false
+    template_changes:
+      shield_refresh_rate: +0%
+      energy_refresh_rate: +0%
+      population_value: 0
+
+  Procurator_Battlecruiser:
+    base_unit: Skirmish_Procurator_Battlecruiser
+    campaign_unit: Procurator_Battlecruiser
+    unlock_normal_market: false
+    template_changes:
+      shield_refresh_rate: +0%
+      shield_points: +0%
+      energy_refresh_rate: +0%
+      population_value: 0
+    hardpoints:
+      damage_increase: +0%
+      burst_delay_adjustment: +0%
+      fire_rate_increase: +0%
