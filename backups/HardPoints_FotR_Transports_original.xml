@@ -1,0 +1,550 @@
+<?xml version='1.0' encoding='us-ascii'?>
+<HardPoints>
+
+<!-- =============================================            ============================================= -->
+<!-- =============================================     CIS    ============================================= -->
+<!-- =============================================            ============================================= -->
+
+	<!-- Sheathipede-class Transport -->
+	<HardPoint Name="HP_Sheathipede_01">
+		<Type> HARD_POINT_WEAPON_LASER </Type>
+		<Is_Targetable>No</Is_Targetable>
+		<Is_Destroyable>No</Is_Destroyable>
+
+		<Fire_Bone_A>MUZZLEA_00</Fire_Bone_A>
+		<Fire_Bone_B>MUZZLEA_00</Fire_Bone_B>
+		<Fire_Cone_Width>180.0</Fire_Cone_Width>
+		<Fire_Cone_Height>180.0</Fire_Cone_Height>
+		<Fire_Projectile_Type>Proj_Ship_Fighter_Laser_Cannon_Red</Fire_Projectile_Type>
+		<Fire_Min_Recharge_Seconds>2.0</Fire_Min_Recharge_Seconds>
+		<Fire_Max_Recharge_Seconds>2.0</Fire_Max_Recharge_Seconds>
+		<Fire_Pulse_Count>2</Fire_Pulse_Count>
+		<Fire_Pulse_Delay_Seconds>0.1</Fire_Pulse_Delay_Seconds>
+		<Fire_Range_Distance>550.0</Fire_Range_Distance>
+		<Fire_SFXEvent>Unit_Rebel_Ship_Laser_Cannon_Fire</Fire_SFXEvent>
+
+		<Fire_Inaccuracy_Distance> Fighter, 4.0 </Fire_Inaccuracy_Distance>
+		<Fire_Inaccuracy_Distance> Bomber, 4.0 </Fire_Inaccuracy_Distance>
+		<Fire_Inaccuracy_Distance> Transport, 10.0 </Fire_Inaccuracy_Distance>
+		<Fire_Inaccuracy_Distance> Gunship, 10.0 </Fire_Inaccuracy_Distance>
+		<Fire_Inaccuracy_Distance> Corvette, 10.0 </Fire_Inaccuracy_Distance>
+		<Fire_Inaccuracy_Distance> Frigate, 20.0 </Fire_Inaccuracy_Distance>
+		<Fire_Inaccuracy_Distance> Capital, 20.0 </Fire_Inaccuracy_Distance>
+		<Fire_Inaccuracy_Distance> SuperCapital, 20.0 </Fire_Inaccuracy_Distance>
+
+		<Fire_Category_Restrictions> Infantry, InfantryHero, Vehicle, VehicleHero, Structure, AirGunship, AirSpeeder </Fire_Category_Restrictions>
+	</HardPoint>
+
+	<HardPoint Name="HP_Sheathipede_02">
+		<Type> HARD_POINT_WEAPON_LASER </Type>
+		<Is_Targetable>No</Is_Targetable>
+		<Is_Destroyable>No</Is_Destroyable>
+
+		<Fire_Bone_A>MUZZLEA_01</Fire_Bone_A>
+		<Fire_Bone_B>MUZZLEA_01</Fire_Bone_B>
+		<Fire_Cone_Width>180.0</Fire_Cone_Width>
+		<Fire_Cone_Height>180.0</Fire_Cone_Height>
+		<Fire_Projectile_Type>Proj_Ship_Fighter_Laser_Cannon_Red</Fire_Projectile_Type>
+		<Fire_Min_Recharge_Seconds>2.0</Fire_Min_Recharge_Seconds>
+		<Fire_Max_Recharge_Seconds>2.0</Fire_Max_Recharge_Seconds>
+		<Fire_Pulse_Count>2</Fire_Pulse_Count>
+		<Fire_Pulse_Delay_Seconds>0.1</Fire_Pulse_Delay_Seconds>
+		<Fire_Range_Distance>550.0</Fire_Range_Distance>
+		<Fire_SFXEvent>Unit_Rebel_Ship_Laser_Cannon_Fire</Fire_SFXEvent>
+
+		<Fire_Inaccuracy_Distance> Fighter, 4.0 </Fire_Inaccuracy_Distance>
+		<Fire_Inaccuracy_Distance> Bomber, 4.0 </Fire_Inaccuracy_Distance>
+		<Fire_Inaccuracy_Distance> Transport, 10.0 </Fire_Inaccuracy_Distance>
+		<Fire_Inaccuracy_Distance> Gunship, 10.0 </Fire_Inaccuracy_Distance>
+		<Fire_Inaccuracy_Distance> Corvette, 10.0 </Fire_Inaccuracy_Distance>
+		<Fire_Inaccuracy_Distance> Frigate, 20.0 </Fire_Inaccuracy_Distance>
+		<Fire_Inaccuracy_Distance> Capital, 20.0 </Fire_Inaccuracy_Distance>
+		<Fire_Inaccuracy_Distance> SuperCapital, 20.0 </Fire_Inaccuracy_Distance>
+
+		<Fire_Category_Restrictions> Infantry, InfantryHero, Vehicle, VehicleHero, Structure, AirGunship, AirSpeeder </Fire_Category_Restrictions>
+	</HardPoint>
+
+	<HardPoint Name="HP_Sheathipede_03">
+		<Type> HARD_POINT_WEAPON_LASER </Type>
+		<Is_Targetable>No</Is_Targetable>
+		<Is_Destroyable>No</Is_Destroyable>
+
+		<Fire_Bone_A>MUZZLEA_02</Fire_Bone_A>
+		<Fire_Bone_B>MUZZLEA_02</Fire_Bone_B>
+		<Fire_Cone_Width>180.0</Fire_Cone_Width>
+		<Fire_Cone_Height>180.0</Fire_Cone_Height>
+		<Fire_Projectile_Type>Proj_Ship_Fighter_Laser_Cannon_Red</Fire_Projectile_Type>
+		<Fire_Min_Recharge_Seconds>2.0</Fire_Min_Recharge_Seconds>
+		<Fire_Max_Recharge_Seconds>2.0</Fire_Max_Recharge_Seconds>
+		<Fire_Pulse_Count>2</Fire_Pulse_Count>
+		<Fire_Pulse_Delay_Seconds>0.1</Fire_Pulse_Delay_Seconds>
+		<Fire_Range_Distance>550.0</Fire_Range_Distance>
+		<Fire_SFXEvent>Unit_Rebel_Ship_Laser_Cannon_Fire</Fire_SFXEvent>
+
+		<Fire_Inaccuracy_Distance> Fighter, 4.0 </Fire_Inaccuracy_Distance>
+		<Fire_Inaccuracy_Distance> Bomber, 4.0 </Fire_Inaccuracy_Distance>
+		<Fire_Inaccuracy_Distance> Transport, 10.0 </Fire_Inaccuracy_Distance>
+		<Fire_Inaccuracy_Distance> Gunship, 10.0 </Fire_Inaccuracy_Distance>
+		<Fire_Inaccuracy_Distance> Corvette, 10.0 </Fire_Inaccuracy_Distance>
+		<Fire_Inaccuracy_Distance> Frigate, 20.0 </Fire_Inaccuracy_Distance>
+		<Fire_Inaccuracy_Distance> Capital, 20.0 </Fire_Inaccuracy_Distance>
+		<Fire_Inaccuracy_Distance> SuperCapital, 20.0 </Fire_Inaccuracy_Distance>
+
+		<Fire_Category_Restrictions> Infantry, InfantryHero, Vehicle, VehicleHero, Structure, AirGunship, AirSpeeder </Fire_Category_Restrictions>
+	</HardPoint>
+
+
+	<!-- Star Courier -->
+	<HardPoint Name="HP_Star_Courier_01">
+		<Type> HARD_POINT_WEAPON_LASER </Type>
+		<Is_Targetable>No</Is_Targetable>
+		<Is_Destroyable>No</Is_Destroyable>
+
+		<Fire_Bone_A>MuzzleA_01</Fire_Bone_A>
+		<Fire_Bone_B>MuzzleA_02</Fire_Bone_B>
+		<Fire_Cone_Width>30.0</Fire_Cone_Width>
+		<Fire_Cone_Height>30.0</Fire_Cone_Height>
+		<Fire_Projectile_Type>Proj_Ship_Fighter_Laser_Cannon_Red_Heavy</Fire_Projectile_Type>
+		<Fire_Min_Recharge_Seconds>2</Fire_Min_Recharge_Seconds>
+		<Fire_Max_Recharge_Seconds>2</Fire_Max_Recharge_Seconds>
+		<Fire_Pulse_Count>6</Fire_Pulse_Count>
+		<Fire_Pulse_Delay_Seconds>0.2</Fire_Pulse_Delay_Seconds>
+		<Fire_Range_Distance>1000.0</Fire_Range_Distance>
+		<Fire_SFXEvent>Unit_Empire_Ship_Laser_Fire</Fire_SFXEvent>
+		<Randomize_Between_Fire_Bones> No </Randomize_Between_Fire_Bones>
+
+
+		<Fire_Inaccuracy_Distance> Fighter, 4.0 </Fire_Inaccuracy_Distance>
+		<Fire_Inaccuracy_Distance> Bomber, 4.0 </Fire_Inaccuracy_Distance>
+		<Fire_Inaccuracy_Distance> Transport, 10.0 </Fire_Inaccuracy_Distance>
+		<Fire_Inaccuracy_Distance> Gunship, 10.0 </Fire_Inaccuracy_Distance>
+		<Fire_Inaccuracy_Distance> Corvette, 10.0 </Fire_Inaccuracy_Distance>
+		<Fire_Inaccuracy_Distance> Frigate, 20.0 </Fire_Inaccuracy_Distance>
+		<Fire_Inaccuracy_Distance> Capital, 20.0 </Fire_Inaccuracy_Distance>
+		<Fire_Inaccuracy_Distance> SuperCapital, 20.0 </Fire_Inaccuracy_Distance>
+
+		<Fire_Category_Restrictions> Infantry, InfantryHero, Vehicle, VehicleHero, Structure, AirGunship, AirSpeeder </Fire_Category_Restrictions>
+	</HardPoint>
+
+	<HardPoint Name="HP_Star_Courier_02">
+		<Type> HARD_POINT_WEAPON_LASER </Type>
+		<Is_Targetable>No</Is_Targetable>
+		<Is_Destroyable>No</Is_Destroyable>
+
+		<Fire_Bone_A>MuzzleA_04</Fire_Bone_A>
+		<Fire_Bone_B>MuzzleA_05</Fire_Bone_B>
+		<Fire_Cone_Width>30.0</Fire_Cone_Width>
+		<Fire_Cone_Height>30.0</Fire_Cone_Height>
+		<Fire_Projectile_Type>Proj_Ship_Fighter_Laser_Cannon_Red_Heavy</Fire_Projectile_Type>
+		<Fire_Min_Recharge_Seconds>2</Fire_Min_Recharge_Seconds>
+		<Fire_Max_Recharge_Seconds>2</Fire_Max_Recharge_Seconds>
+		<Fire_Pulse_Count>6</Fire_Pulse_Count>
+		<Fire_Pulse_Delay_Seconds>0.2</Fire_Pulse_Delay_Seconds>
+		<Fire_Range_Distance>1000.0</Fire_Range_Distance>
+		<Fire_SFXEvent>Unit_Empire_Ship_Laser_Fire</Fire_SFXEvent>
+		<Randomize_Between_Fire_Bones> No </Randomize_Between_Fire_Bones>
+
+
+		<Fire_Inaccuracy_Distance> Fighter, 4.0 </Fire_Inaccuracy_Distance>
+		<Fire_Inaccuracy_Distance> Bomber, 4.0 </Fire_Inaccuracy_Distance>
+		<Fire_Inaccuracy_Distance> Transport, 10.0 </Fire_Inaccuracy_Distance>
+		<Fire_Inaccuracy_Distance> Gunship, 10.0 </Fire_Inaccuracy_Distance>
+		<Fire_Inaccuracy_Distance> Corvette, 10.0 </Fire_Inaccuracy_Distance>
+		<Fire_Inaccuracy_Distance> Frigate, 20.0 </Fire_Inaccuracy_Distance>
+		<Fire_Inaccuracy_Distance> Capital, 20.0 </Fire_Inaccuracy_Distance>
+		<Fire_Inaccuracy_Distance> SuperCapital, 20.0 </Fire_Inaccuracy_Distance>
+
+		<Fire_Category_Restrictions> Infantry, InfantryHero, Vehicle, VehicleHero, Structure, AirGunship, AirSpeeder </Fire_Category_Restrictions>
+	</HardPoint>
+
+	<HardPoint Name="HP_Star_Courier_Ground_01">
+		<Type> HARD_POINT_WEAPON_LASER </Type>
+		<Is_Targetable>No</Is_Targetable>
+		<Is_Destroyable>No</Is_Destroyable>
+
+		<Fire_Bone_A>MUZZLEA_00</Fire_Bone_A>
+		<Fire_Bone_B>MUZZLEA_03</Fire_Bone_B>
+		<Randomize_Between_Fire_Bones> No </Randomize_Between_Fire_Bones>
+		<Fire_Cone_Width>360.0</Fire_Cone_Width>
+		<Fire_Cone_Height>360.0</Fire_Cone_Height>
+		<Fire_Projectile_Type>Proj_Heavy_AV_Blaster_Red</Fire_Projectile_Type>
+		<Fire_Min_Recharge_Seconds>1</Fire_Min_Recharge_Seconds>
+		<Fire_Max_Recharge_Seconds>1</Fire_Max_Recharge_Seconds>
+		<Fire_Pulse_Count>2</Fire_Pulse_Count>
+		<Fire_Pulse_Delay_Seconds>0.3</Fire_Pulse_Delay_Seconds>
+		<Fire_Range_Distance>400.0</Fire_Range_Distance>
+		<Fire_SFXEvent>Unit_Turbo_Tower_Fire</Fire_SFXEvent>
+
+		<Fire_Inaccuracy_Distance> Infantry, 20.0 </Fire_Inaccuracy_Distance>
+		<Fire_Inaccuracy_Distance> InfantryHero, 20.0 </Fire_Inaccuracy_Distance>
+		<Fire_Inaccuracy_Distance> Vehicle, 5.0 </Fire_Inaccuracy_Distance>
+		<Fire_Inaccuracy_Distance> VehicleHero, 5.0 </Fire_Inaccuracy_Distance>
+		<Fire_Inaccuracy_Distance> AirGunship, 30.0 </Fire_Inaccuracy_Distance>
+		<Fire_Inaccuracy_Distance> AirSpeeder, 30.0 </Fire_Inaccuracy_Distance>
+		<Fire_Inaccuracy_Distance> Structure, 5.0 </Fire_Inaccuracy_Distance>
+	</HardPoint>
+
+
+<!-- =============================================            ============================================= -->
+<!-- =============================================  REPUBLIC  ============================================= -->
+<!-- =============================================            ============================================= -->
+
+	<!-- Nu-Class Attack Shuttle -->
+	<HardPoint Name="HP_Nu_Shuttle_01">
+		<Type> HARD_POINT_WEAPON_LASER </Type>
+		<Is_Targetable>No</Is_Targetable>
+		<Is_Destroyable>No</Is_Destroyable>
+
+		<Fire_Bone_A>MUZZLEA_00</Fire_Bone_A>
+		<Fire_Bone_B>MUZZLEA_00</Fire_Bone_B>
+        <Fire_Cone_Width>30.0</Fire_Cone_Width>
+        <Fire_Cone_Height>30.0</Fire_Cone_Height>
+		<Fire_Projectile_Type>Proj_Ship_Fighter_Laser_Cannon_Blue_Heavy</Fire_Projectile_Type>
+		<Fire_Min_Recharge_Seconds>2.0</Fire_Min_Recharge_Seconds>
+		<Fire_Max_Recharge_Seconds>2.0</Fire_Max_Recharge_Seconds>
+		<Fire_Pulse_Count>4</Fire_Pulse_Count>
+		<Fire_Pulse_Delay_Seconds>0.2</Fire_Pulse_Delay_Seconds>
+		<Fire_Range_Distance>500.0</Fire_Range_Distance>
+		<Fire_SFXEvent>Unit_Rebel_Ship_Laser_Fire</Fire_SFXEvent>
+
+		<Fire_Inaccuracy_Distance> Fighter, 4.0 </Fire_Inaccuracy_Distance>
+		<Fire_Inaccuracy_Distance> Bomber, 4.0 </Fire_Inaccuracy_Distance>
+		<Fire_Inaccuracy_Distance> Transport, 10.0 </Fire_Inaccuracy_Distance>
+		<Fire_Inaccuracy_Distance> Gunship, 10.0 </Fire_Inaccuracy_Distance>
+		<Fire_Inaccuracy_Distance> Corvette, 10.0 </Fire_Inaccuracy_Distance>
+		<Fire_Inaccuracy_Distance> Frigate, 20.0 </Fire_Inaccuracy_Distance>
+		<Fire_Inaccuracy_Distance> Capital, 20.0 </Fire_Inaccuracy_Distance>
+		<Fire_Inaccuracy_Distance> SuperCapital, 20.0 </Fire_Inaccuracy_Distance>
+
+		<Fire_Category_Restrictions> Infantry, InfantryHero, Vehicle, VehicleHero, Structure, AirGunship, AirSpeeder </Fire_Category_Restrictions>
+	</HardPoint>
+
+	<HardPoint Name="HP_Nu_Shuttle_02">
+		<Type> HARD_POINT_WEAPON_LASER </Type>
+		<Is_Targetable>No</Is_Targetable>
+		<Is_Destroyable>No</Is_Destroyable>
+
+		<Fire_Bone_A>MUZZLEA_01</Fire_Bone_A>
+		<Fire_Bone_B>MUZZLEA_01</Fire_Bone_B>
+        <Fire_Cone_Width>30.0</Fire_Cone_Width>
+        <Fire_Cone_Height>30.0</Fire_Cone_Height>
+		<Fire_Projectile_Type>Proj_Ship_Fighter_Laser_Cannon_Blue_Heavy</Fire_Projectile_Type>
+		<Fire_Min_Recharge_Seconds>2.0</Fire_Min_Recharge_Seconds>
+		<Fire_Max_Recharge_Seconds>2.0</Fire_Max_Recharge_Seconds>
+		<Fire_Pulse_Count>4</Fire_Pulse_Count>
+		<Fire_Pulse_Delay_Seconds>0.2</Fire_Pulse_Delay_Seconds>
+		<Fire_Range_Distance>550.0</Fire_Range_Distance>
+		<Fire_SFXEvent>Unit_Rebel_Ship_Laser_Fire</Fire_SFXEvent>
+
+		<Fire_Inaccuracy_Distance> Fighter, 4.0 </Fire_Inaccuracy_Distance>
+		<Fire_Inaccuracy_Distance> Bomber, 4.0 </Fire_Inaccuracy_Distance>
+		<Fire_Inaccuracy_Distance> Transport, 10.0 </Fire_Inaccuracy_Distance>
+		<Fire_Inaccuracy_Distance> Gunship, 10.0 </Fire_Inaccuracy_Distance>
+		<Fire_Inaccuracy_Distance> Corvette, 10.0 </Fire_Inaccuracy_Distance>
+		<Fire_Inaccuracy_Distance> Frigate, 20.0 </Fire_Inaccuracy_Distance>
+		<Fire_Inaccuracy_Distance> Capital, 20.0 </Fire_Inaccuracy_Distance>
+		<Fire_Inaccuracy_Distance> SuperCapital, 20.0 </Fire_Inaccuracy_Distance>
+
+		<Fire_Category_Restrictions> Infantry, InfantryHero, Vehicle, VehicleHero, Structure, AirGunship, AirSpeeder </Fire_Category_Restrictions>
+	</HardPoint>
+
+	<HardPoint Name="HP_Nu_Shuttle_03">
+		<Type> HARD_POINT_WEAPON_LASER </Type>
+		<Is_Targetable>No</Is_Targetable>
+		<Is_Destroyable>No</Is_Destroyable>
+
+		<Fire_Bone_A>MUZZLEA_02</Fire_Bone_A>
+		<Fire_Bone_B>MUZZLEA_02</Fire_Bone_B>
+        <Fire_Cone_Width>30.0</Fire_Cone_Width>
+        <Fire_Cone_Height>30.0</Fire_Cone_Height>
+		<Fire_Projectile_Type>Proj_Ship_Fighter_Laser_Cannon_Blue</Fire_Projectile_Type>
+		<Fire_Min_Recharge_Seconds>2.0</Fire_Min_Recharge_Seconds>
+		<Fire_Max_Recharge_Seconds>2.0</Fire_Max_Recharge_Seconds>
+		<Fire_Pulse_Count>4</Fire_Pulse_Count>
+		<Fire_Pulse_Delay_Seconds>0.2</Fire_Pulse_Delay_Seconds>
+		<Fire_Range_Distance>500.0</Fire_Range_Distance>
+		<Fire_SFXEvent>Unit_Rebel_Ship_Laser_Fire</Fire_SFXEvent>
+
+		<Fire_Inaccuracy_Distance> Fighter, 4.0 </Fire_Inaccuracy_Distance>
+		<Fire_Inaccuracy_Distance> Bomber, 4.0 </Fire_Inaccuracy_Distance>
+		<Fire_Inaccuracy_Distance> Transport, 10.0 </Fire_Inaccuracy_Distance>
+		<Fire_Inaccuracy_Distance> Gunship, 10.0 </Fire_Inaccuracy_Distance>
+		<Fire_Inaccuracy_Distance> Corvette, 10.0 </Fire_Inaccuracy_Distance>
+		<Fire_Inaccuracy_Distance> Frigate, 20.0 </Fire_Inaccuracy_Distance>
+		<Fire_Inaccuracy_Distance> Capital, 20.0 </Fire_Inaccuracy_Distance>
+		<Fire_Inaccuracy_Distance> SuperCapital, 20.0 </Fire_Inaccuracy_Distance>
+
+		<Fire_Category_Restrictions> Infantry, InfantryHero, Vehicle, VehicleHero, Structure, AirGunship, AirSpeeder </Fire_Category_Restrictions>
+	</HardPoint>
+
+	<HardPoint Name="HP_Nu_Shuttle_04">
+		<Type> HARD_POINT_WEAPON_LASER </Type>
+		<Is_Targetable>No</Is_Targetable>
+		<Is_Destroyable>No</Is_Destroyable>
+
+		<Fire_Bone_A>MUZZLEA_03</Fire_Bone_A>
+		<Fire_Bone_B>MUZZLEA_03</Fire_Bone_B>
+        <Fire_Cone_Width>30.0</Fire_Cone_Width>
+        <Fire_Cone_Height>30.0</Fire_Cone_Height>
+		<Fire_Projectile_Type>Proj_Ship_Fighter_Laser_Cannon_Blue</Fire_Projectile_Type>
+		<Fire_Min_Recharge_Seconds>2.0</Fire_Min_Recharge_Seconds>
+		<Fire_Max_Recharge_Seconds>2.0</Fire_Max_Recharge_Seconds>
+		<Fire_Pulse_Count>4</Fire_Pulse_Count>
+		<Fire_Pulse_Delay_Seconds>0.2</Fire_Pulse_Delay_Seconds>
+		<Fire_Range_Distance>500.0</Fire_Range_Distance>
+		<Fire_SFXEvent>Unit_Rebel_Ship_Laser_Fire</Fire_SFXEvent>
+
+		<Fire_Inaccuracy_Distance> Fighter, 4.0 </Fire_Inaccuracy_Distance>
+		<Fire_Inaccuracy_Distance> Bomber, 4.0 </Fire_Inaccuracy_Distance>
+		<Fire_Inaccuracy_Distance> Transport, 10.0 </Fire_Inaccuracy_Distance>
+		<Fire_Inaccuracy_Distance> Gunship, 10.0 </Fire_Inaccuracy_Distance>
+		<Fire_Inaccuracy_Distance> Corvette, 10.0 </Fire_Inaccuracy_Distance>
+		<Fire_Inaccuracy_Distance> Frigate, 20.0 </Fire_Inaccuracy_Distance>
+		<Fire_Inaccuracy_Distance> Capital, 20.0 </Fire_Inaccuracy_Distance>
+		<Fire_Inaccuracy_Distance> SuperCapital, 20.0 </Fire_Inaccuracy_Distance>
+
+		<Fire_Category_Restrictions> Infantry, InfantryHero, Vehicle, VehicleHero, Structure, AirGunship, AirSpeeder </Fire_Category_Restrictions>
+	</HardPoint>
+
+    <HardPoint Name="HP_ThetaShuttle_01">
+			<Type> HARD_POINT_WEAPON_LASER </Type>
+            <Is_Targetable>No</Is_Targetable>
+            <Is_Destroyable>No</Is_Destroyable>
+
+            <Fire_Bone_A>MUZZLEA_00</Fire_Bone_A>
+            <Fire_Bone_B>MUZZLEA_01</Fire_Bone_B>
+            <Fire_Cone_Width>180.0</Fire_Cone_Width>
+            <Fire_Cone_Height>180.0</Fire_Cone_Height>
+            <Fire_Projectile_Type>Proj_Ship_Fighter_Laser_Cannon_Green_Heavy</Fire_Projectile_Type>
+            <Fire_Min_Recharge_Seconds>1.0</Fire_Min_Recharge_Seconds>
+            <Fire_Max_Recharge_Seconds>1.0</Fire_Max_Recharge_Seconds>
+            <Fire_Pulse_Count>4</Fire_Pulse_Count>
+            <Fire_Pulse_Delay_Seconds>0.1</Fire_Pulse_Delay_Seconds>
+            <Fire_Range_Distance>550.0</Fire_Range_Distance>
+			<Fire_SFXEvent>Unit_Rebel_Ship_Laser_Fire</Fire_SFXEvent>
+
+			<Fire_Inaccuracy_Distance> Fighter, 3.0 </Fire_Inaccuracy_Distance>
+			<Fire_Inaccuracy_Distance> Bomber, 3.0 </Fire_Inaccuracy_Distance>
+			<Fire_Inaccuracy_Distance> Transport, 3.0 </Fire_Inaccuracy_Distance>
+			<Fire_Inaccuracy_Distance> Gunship, 3.0 </Fire_Inaccuracy_Distance>
+		<Fire_Inaccuracy_Distance> Corvette, 3.0 </Fire_Inaccuracy_Distance>
+			<Fire_Inaccuracy_Distance> Frigate, 3.0 </Fire_Inaccuracy_Distance>
+			<Fire_Inaccuracy_Distance> Capital, 3.0 </Fire_Inaccuracy_Distance>
+			<Fire_Inaccuracy_Distance> SuperCapital, 3.0 </Fire_Inaccuracy_Distance>
+	</HardPoint>
+
+    <HardPoint Name="HP_ThetaShuttle_02">
+			<Type> HARD_POINT_WEAPON_MISSILE </Type>
+            <Is_Targetable>No</Is_Targetable>
+            <Is_Destroyable>No</Is_Destroyable>
+            <Tooltip_Text>TEXT_WEAPON_CONCUSSIONMISSILE</Tooltip_Text>
+
+            <Fire_Bone_A>MUZZLEB_01</Fire_Bone_A>
+            <Fire_Bone_B>MUZZLEB_02</Fire_Bone_B>
+            <Fire_Cone_Width>120</Fire_Cone_Width>
+            <Fire_Cone_Height>120.0</Fire_Cone_Height>
+            <Fire_Projectile_Type>Proj_Ship_Concussion_Missile_Fighter</Fire_Projectile_Type>
+            <Fire_Min_Recharge_Seconds>25.0</Fire_Min_Recharge_Seconds>
+            <Fire_Max_Recharge_Seconds>25.0</Fire_Max_Recharge_Seconds>
+            <Fire_Pulse_Count>2</Fire_Pulse_Count>
+            <Fire_Pulse_Delay_Seconds>0.1</Fire_Pulse_Delay_Seconds>
+            <Fire_Range_Distance>900.0</Fire_Range_Distance>
+			<Fire_SFXEvent>Unit_Missile_Fire</Fire_SFXEvent>
+    </HardPoint>
+
+    <HardPoint Name="HP_ThetaShuttle_03">
+			<Type> HARD_POINT_WEAPON_LASER </Type>
+            <Is_Targetable>No</Is_Targetable>
+            <Is_Destroyable>No</Is_Destroyable>
+
+            <Fire_Bone_A>MUZZLEA_03</Fire_Bone_A>
+            <Fire_Bone_B>MUZZLEA_03</Fire_Bone_B>
+            <Fire_Cone_Width>180.0</Fire_Cone_Width>
+            <Fire_Cone_Height>180.0</Fire_Cone_Height>
+            <Fire_Projectile_Type>Proj_Ship_Turbolaser_Green_Fighter</Fire_Projectile_Type>
+            <Fire_Min_Recharge_Seconds>3.0</Fire_Min_Recharge_Seconds>
+            <Fire_Max_Recharge_Seconds>3.0</Fire_Max_Recharge_Seconds>
+            <Fire_Pulse_Count>1</Fire_Pulse_Count>
+            <Fire_Pulse_Delay_Seconds>0.2</Fire_Pulse_Delay_Seconds>
+            <Fire_Range_Distance>700.0</Fire_Range_Distance>
+	        <Randomize_Between_Fire_Bones> No </Randomize_Between_Fire_Bones>
+			<Fire_SFXEvent>Unit_Rebel_Ship_Laser_Fire</Fire_SFXEvent>
+
+			<Fire_Inaccuracy_Distance> Fighter, 18.0 </Fire_Inaccuracy_Distance>
+			<Fire_Inaccuracy_Distance> Bomber, 18.0 </Fire_Inaccuracy_Distance>
+			<Fire_Inaccuracy_Distance> Transport, 18.0 </Fire_Inaccuracy_Distance>
+			<Fire_Inaccuracy_Distance> Gunship, 18.0 </Fire_Inaccuracy_Distance>
+		<Fire_Inaccuracy_Distance> Corvette, 18.0 </Fire_Inaccuracy_Distance>
+			<Fire_Inaccuracy_Distance> Frigate, 18.0 </Fire_Inaccuracy_Distance>
+			<Fire_Inaccuracy_Distance> Capital, 18.0 </Fire_Inaccuracy_Distance>
+			<Fire_Inaccuracy_Distance> SuperCapital, 18.0 </Fire_Inaccuracy_Distance>
+    </HardPoint>
+
+    <HardPoint Name="HP_ThetaShuttle_Ground_01">
+		<Type> HARD_POINT_WEAPON_LASER </Type>
+        <Is_Targetable>No</Is_Targetable>
+        <Is_Destroyable>No</Is_Destroyable>
+
+        <Fire_Bone_A>MUZZLEA_00</Fire_Bone_A>
+		<Fire_Bone_B>MUZZLEA_01</Fire_Bone_B>
+		<Randomize_Between_Fire_Bones> No </Randomize_Between_Fire_Bones>
+        <Fire_Cone_Width>180.0</Fire_Cone_Width>
+        <Fire_Cone_Height>180.0</Fire_Cone_Height>
+        <Fire_Projectile_Type>Proj_AV_Blaster_Red</Fire_Projectile_Type>
+        <Fire_Min_Recharge_Seconds>1</Fire_Min_Recharge_Seconds>
+        <Fire_Max_Recharge_Seconds>1</Fire_Max_Recharge_Seconds>
+        <Fire_Pulse_Count>2</Fire_Pulse_Count>
+        <Fire_Pulse_Delay_Seconds>0.3</Fire_Pulse_Delay_Seconds>
+        <Fire_Range_Distance>600.0</Fire_Range_Distance>
+		<Fire_SFXEvent>Unit_Turbo_Tower_Fire</Fire_SFXEvent>
+
+		<Fire_Inaccuracy_Distance> Infantry, 20.0 </Fire_Inaccuracy_Distance>
+		<Fire_Inaccuracy_Distance> InfantryHero, 20.0 </Fire_Inaccuracy_Distance>
+		<Fire_Inaccuracy_Distance> Vehicle, 5.0 </Fire_Inaccuracy_Distance>
+		<Fire_Inaccuracy_Distance> VehicleHero, 5.0 </Fire_Inaccuracy_Distance>
+		<Fire_Inaccuracy_Distance> AirGunship, 30.0 </Fire_Inaccuracy_Distance>
+		<Fire_Inaccuracy_Distance> AirSpeeder, 30.0 </Fire_Inaccuracy_Distance>
+		<Fire_Inaccuracy_Distance> Structure, 5.0 </Fire_Inaccuracy_Distance>
+    </HardPoint>
+
+    <HardPoint Name="HP_ThetaShuttle_Ground_02">
+		<Type> HARD_POINT_WEAPON_LASER </Type>
+		<Is_Targetable>No</Is_Targetable>
+		<Is_Destroyable>No</Is_Destroyable>
+
+		<Fire_Bone_A>MUZZLEB_00</Fire_Bone_A>
+		<Fire_Bone_B>MUZZLEB_00</Fire_Bone_B>
+		<Fire_Cone_Width>360.0</Fire_Cone_Width>
+		<Fire_Cone_Height>180.0</Fire_Cone_Height>
+		<Fire_Projectile_Type>Proj_AV_Turbolaser_Green</Fire_Projectile_Type>
+		<Fire_Min_Recharge_Seconds>3</Fire_Min_Recharge_Seconds>
+		<Fire_Max_Recharge_Seconds>3</Fire_Max_Recharge_Seconds>
+		<Fire_Pulse_Count>1</Fire_Pulse_Count>
+		<Fire_Pulse_Delay_Seconds>0.15</Fire_Pulse_Delay_Seconds>
+		<Fire_Range_Distance>800.0</Fire_Range_Distance>
+		<Fire_SFXEvent>Unit_AT_AT_Fire</Fire_SFXEvent>
+
+		<Fire_Inaccuracy_Distance> Infantry, 20.0 </Fire_Inaccuracy_Distance>
+		<Fire_Inaccuracy_Distance> InfantryHero, 20.0 </Fire_Inaccuracy_Distance>
+		<Fire_Inaccuracy_Distance> Vehicle, 5.0 </Fire_Inaccuracy_Distance>
+		<Fire_Inaccuracy_Distance> VehicleHero, 5.0 </Fire_Inaccuracy_Distance>
+		<Fire_Inaccuracy_Distance> AirGunship, 30.0 </Fire_Inaccuracy_Distance>
+		<Fire_Inaccuracy_Distance> AirSpeeder, 30.0 </Fire_Inaccuracy_Distance>
+		<Fire_Inaccuracy_Distance> Structure, 5.0 </Fire_Inaccuracy_Distance>
+
+	</HardPoint>
+
+
+	<!-- C-9979 lander/factory for missions -->
+	<HardPoint Name="HP_G_C9979_Laser00">
+		<Type> HARD_POINT_WEAPON_LASER </Type>
+		<Is_Targetable>No</Is_Targetable>
+		<Is_Destroyable>No</Is_Destroyable>
+
+
+		<Fire_Bone_A>MuzzleA_00</Fire_Bone_A>
+		<Fire_Bone_B>MuzzleA_00</Fire_Bone_B>
+		<Fire_Cone_Width>360.0</Fire_Cone_Width>
+		<Fire_Cone_Height>180.0</Fire_Cone_Height>
+		<Fire_Projectile_Type>Proj_Heavy_AV_Blaster_Red</Fire_Projectile_Type>
+		<Fire_Min_Recharge_Seconds>1</Fire_Min_Recharge_Seconds>
+		<Fire_Max_Recharge_Seconds>1</Fire_Max_Recharge_Seconds>
+		<Fire_Pulse_Count>2</Fire_Pulse_Count>
+		<Fire_Pulse_Delay_Seconds>0.3</Fire_Pulse_Delay_Seconds>
+		<Fire_Range_Distance>800.0</Fire_Range_Distance>
+		<Fire_SFXEvent>Unit_Turbo_Tower_Fire</Fire_SFXEvent>
+
+		<Fire_Inaccuracy_Distance> Infantry, 20.0 </Fire_Inaccuracy_Distance>
+		<Fire_Inaccuracy_Distance> InfantryHero, 20.0 </Fire_Inaccuracy_Distance>
+		<Fire_Inaccuracy_Distance> Vehicle, 5.0 </Fire_Inaccuracy_Distance>
+		<Fire_Inaccuracy_Distance> VehicleHero, 5.0 </Fire_Inaccuracy_Distance>
+		<Fire_Inaccuracy_Distance> AirGunship, 30.0 </Fire_Inaccuracy_Distance>
+		<Fire_Inaccuracy_Distance> AirSpeeder, 30.0 </Fire_Inaccuracy_Distance>
+		<Fire_Inaccuracy_Distance> Structure, 5.0 </Fire_Inaccuracy_Distance>
+	</HardPoint>
+
+	<HardPoint Name="HP_G_C9979_Laser01">
+		<Type> HARD_POINT_WEAPON_LASER </Type>
+		<Is_Targetable>No</Is_Targetable>
+		<Is_Destroyable>No</Is_Destroyable>
+
+
+		<Fire_Bone_A>MuzzleA_01</Fire_Bone_A>
+		<Fire_Bone_B>MuzzleA_01</Fire_Bone_B>
+		<Fire_Cone_Width>360.0</Fire_Cone_Width>
+		<Fire_Cone_Height>180.0</Fire_Cone_Height>
+		<Fire_Projectile_Type>Proj_Heavy_AV_Blaster_Red</Fire_Projectile_Type>
+		<Fire_Min_Recharge_Seconds>1</Fire_Min_Recharge_Seconds>
+		<Fire_Max_Recharge_Seconds>1</Fire_Max_Recharge_Seconds>
+		<Fire_Pulse_Count>2</Fire_Pulse_Count>
+		<Fire_Pulse_Delay_Seconds>0.3</Fire_Pulse_Delay_Seconds>
+		<Fire_Range_Distance>800.0</Fire_Range_Distance>
+		<Fire_SFXEvent>Unit_Turbo_Tower_Fire</Fire_SFXEvent>
+
+		<Fire_Inaccuracy_Distance> Infantry, 20.0 </Fire_Inaccuracy_Distance>
+		<Fire_Inaccuracy_Distance> InfantryHero, 20.0 </Fire_Inaccuracy_Distance>
+		<Fire_Inaccuracy_Distance> Vehicle, 5.0 </Fire_Inaccuracy_Distance>
+		<Fire_Inaccuracy_Distance> VehicleHero, 5.0 </Fire_Inaccuracy_Distance>
+		<Fire_Inaccuracy_Distance> AirGunship, 30.0 </Fire_Inaccuracy_Distance>
+		<Fire_Inaccuracy_Distance> AirSpeeder, 30.0 </Fire_Inaccuracy_Distance>
+		<Fire_Inaccuracy_Distance> Structure, 5.0 </Fire_Inaccuracy_Distance>
+	</HardPoint>
+
+	<HardPoint Name="HP_G_C9979_Laser02">
+		<Type> HARD_POINT_WEAPON_LASER </Type>
+		<Is_Targetable>No</Is_Targetable>
+		<Is_Destroyable>No</Is_Destroyable>
+
+
+		<Fire_Bone_A>MuzzleB_00</Fire_Bone_A>
+		<Fire_Bone_B>MuzzleB_00</Fire_Bone_B>
+		<Fire_Cone_Width>120.0</Fire_Cone_Width>
+		<Fire_Cone_Height>180.0</Fire_Cone_Height>
+		<Fire_Projectile_Type>Proj_Heavy_AV_Blaster_Red</Fire_Projectile_Type>
+		<Fire_Min_Recharge_Seconds>1</Fire_Min_Recharge_Seconds>
+		<Fire_Max_Recharge_Seconds>1</Fire_Max_Recharge_Seconds>
+		<Fire_Pulse_Count>2</Fire_Pulse_Count>
+		<Fire_Pulse_Delay_Seconds>0.3</Fire_Pulse_Delay_Seconds>
+		<Fire_Range_Distance>800.0</Fire_Range_Distance>
+		<Fire_SFXEvent>Unit_Turbo_Tower_Fire</Fire_SFXEvent>
+
+		<Fire_Inaccuracy_Distance> Infantry, 20.0 </Fire_Inaccuracy_Distance>
+		<Fire_Inaccuracy_Distance> InfantryHero, 20.0 </Fire_Inaccuracy_Distance>
+		<Fire_Inaccuracy_Distance> Vehicle, 5.0 </Fire_Inaccuracy_Distance>
+		<Fire_Inaccuracy_Distance> VehicleHero, 5.0 </Fire_Inaccuracy_Distance>
+		<Fire_Inaccuracy_Distance> AirGunship, 30.0 </Fire_Inaccuracy_Distance>
+		<Fire_Inaccuracy_Distance> AirSpeeder, 30.0 </Fire_Inaccuracy_Distance>
+		<Fire_Inaccuracy_Distance> Structure, 5.0 </Fire_Inaccuracy_Distance>
+	</HardPoint>
+
+	<HardPoint Name="HP_G_C9979_Laser03">
+		<Type> HARD_POINT_WEAPON_LASER </Type>
+		<Is_Targetable>No</Is_Targetable>
+		<Is_Destroyable>No</Is_Destroyable>
+
+
+		<Fire_Bone_A>MuzzleB_01</Fire_Bone_A>
+		<Fire_Bone_B>MuzzleB_01</Fire_Bone_B>
+		<Fire_Cone_Width>120.0</Fire_Cone_Width>
+		<Fire_Cone_Height>180.0</Fire_Cone_Height>
+		<Fire_Projectile_Type>Proj_Heavy_AV_Blaster_Red</Fire_Projectile_Type>
+		<Fire_Min_Recharge_Seconds>1</Fire_Min_Recharge_Seconds>
+		<Fire_Max_Recharge_Seconds>1</Fire_Max_Recharge_Seconds>
+		<Fire_Pulse_Count>2</Fire_Pulse_Count>
+		<Fire_Pulse_Delay_Seconds>0.3</Fire_Pulse_Delay_Seconds>
+		<Fire_Range_Distance>800.0</Fire_Range_Distance>
+		<Fire_SFXEvent>Unit_Turbo_Tower_Fire</Fire_SFXEvent>
+
+		<Fire_Inaccuracy_Distance> Infantry, 20.0 </Fire_Inaccuracy_Distance>
+		<Fire_Inaccuracy_Distance> InfantryHero, 20.0 </Fire_Inaccuracy_Distance>
+		<Fire_Inaccuracy_Distance> Vehicle, 5.0 </Fire_Inaccuracy_Distance>
+		<Fire_Inaccuracy_Distance> VehicleHero, 5.0 </Fire_Inaccuracy_Distance>
+		<Fire_Inaccuracy_Distance> AirGunship, 30.0 </Fire_Inaccuracy_Distance>
+		<Fire_Inaccuracy_Distance> AirSpeeder, 30.0 </Fire_Inaccuracy_Distance>
+		<Fire_Inaccuracy_Distance> Structure, 5.0 </Fire_Inaccuracy_Distance>
+	</HardPoint>
+
+
+	<!-- Dummy lander for missions -->
+
+</HardPoints>

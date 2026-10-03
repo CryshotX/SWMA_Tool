@@ -19,6 +19,27 @@ import re
 import subprocess
 from typing import Dict, List, Any, Optional, Tuple
 
+
+def _configure_console_output() -> None:
+    """Stellt sicher, dass Konsolenausgaben unter Windows nicht abstürzen.
+
+    Auf der Windows-Konsole (cp1252) werfen Zeichen wie Emojis einen
+    UnicodeEncodeError und brechen das komplette Tool mitten im Lauf ab.
+    Hier werden stdout/stderr auf UTF-8 mit toleranter Fehlerbehandlung
+    umgestellt, damit Sonderzeichen die Verarbeitung nie unterbrechen.
+    """
+    for stream_name in ("stdout", "stderr"):
+        stream = getattr(sys, stream_name, None)
+        reconfigure = getattr(stream, "reconfigure", None)
+        if callable(reconfigure):
+            try:
+                reconfigure(encoding="utf-8", errors="replace")
+            except Exception:
+                pass
+
+
+_configure_console_output()
+
 class BackupManager:
     """Verwaltet Backups der Original-Dateien mit automatischer Wiederherstellung"""
     
@@ -32,14 +53,40 @@ class BackupManager:
         self.xml_base_dir = xml_base_dir
         
         # Liste aller relevanten Dateien für Backups
-        self.relevant_files = [
-            "Units/Templates_Frigates.xml",
-            "Units/Templates_Capitals.xml", 
+        self.relevant_files = self._discover_relevant_files()
+
+    def _discover_relevant_files(self) -> list:
+        """Ermittelt alle relevanten Dateien dynamisch.
+
+        Wichtig: Schiffe können in anderen Template-/Hardpoint-Dateien liegen als
+        Frigates/Capitals (z.B. Arquitens in Templates_Corvettes.xml). Deshalb werden
+        alle Templates_*.xml und alle HardPoints_*.xml des XML-Roots berücksichtigt.
+        """
+        base_files = [
             "Units/Republic_Space_Units.xml",
             "Units/Skirmish/SkirmishUnits_Republic.xml",
-            "Hardpoints/HardPoints_Coresaga_Frigates.xml",
-            "Hardpoints/HardPoints_Coresaga_Capitals.xml"
         ]
+
+        if not self.xml_base_dir:
+            return [
+                "Units/Templates_Frigates.xml",
+                "Units/Templates_Capitals.xml",
+                "Units/Republic_Space_Units.xml",
+                "Units/Skirmish/SkirmishUnits_Republic.xml",
+                "Hardpoints/HardPoints_Coresaga_Frigates.xml",
+                "Hardpoints/HardPoints_Coresaga_Capitals.xml",
+            ]
+
+        files = list(base_files)
+        units_dir = self.xml_base_dir / "Units"
+        hardpoints_dir = self.xml_base_dir / "Hardpoints"
+
+        for path in sorted(units_dir.glob("Templates_*.xml")):
+            files.append(f"Units/{path.name}")
+        for path in sorted(hardpoints_dir.glob("HardPoints_*.xml")):
+            files.append(f"Hardpoints/{path.name}")
+
+        return files
     
     def create_backup(self, file_path: str) -> str:
         """Erstellt ein Backup einer Datei, aber nur wenn noch kein Backup existiert"""
@@ -347,12 +394,21 @@ class SWModdingTool:
 
         return (Path.cwd() / config_path).resolve()
 
-    def __init__(self, config_file: str, backup_originals: bool = True):
+    def __init__(self, config_file: str, backup_originals: bool = True, xml_root: Optional[str] = None):
         self.config_file = str(self._resolve_config_path(config_file))
-        
-        # XML-Verzeichnis robust ermitteln
-        self.xml_base_dir = self._find_xml_base_dir()
-        
+
+        # XML-Verzeichnis robust ermitteln, optional mit explizitem Root durch CLI/Benutzer
+        if xml_root:
+            candidate = Path(xml_root).expanduser()
+            if not candidate.is_absolute():
+                candidate = (Path.cwd() / candidate).resolve()
+            if candidate.exists() and self._looks_like_xml_root(candidate):
+                self.xml_base_dir = candidate.resolve()
+            else:
+                self.xml_base_dir = candidate.resolve()
+        else:
+            self.xml_base_dir = self._find_xml_base_dir()
+
         # BackupManager mit XML-Basis-Verzeichnis initialisieren
         self.backup_manager = BackupManager(xml_base_dir=self.xml_base_dir) if backup_originals else None
         self.xml_processor = XMLProcessor()
@@ -379,8 +435,81 @@ class SWModdingTool:
         except yaml.YAMLError as e:
             raise ValueError(f"YAML-Parse-Fehler: {e}")
     
+    def _find_file_containing_template(self, template_name: str) -> Optional[Path]:
+        """Sucht die Template-Datei, in der ein Template tatsächlich definiert ist.
+
+        Wichtig: Die Zuordnung erfolgt über den echten Spielinhalt, nicht über den
+        Einheitennamen. Beispiel: Template_Arquitens liegt in Templates_Corvettes.xml,
+        nicht in Templates_Frigates.xml.
+        """
+        if not template_name:
+            return None
+        units_dir = self.xml_base_dir / "Units"
+        if not units_dir.exists():
+            return None
+        for path in sorted(units_dir.glob("Templates_*.xml")):
+            try:
+                tree = self.xml_processor.load_xml(str(path))
+            except Exception:
+                continue
+            if self.xml_processor.find_template_element(tree, template_name) is not None:
+                return path
+        return None
+
+    def _resolve_template_name_for_unit(self, unit_config: Dict[str, Any]) -> Optional[str]:
+        """Ermittelt den Template-Namen einer Einheit über Variant_Of_Existing_Type.
+
+        Sucht in Campaign- und Skirmish-Dateien nach der Unit und liest den
+        Template-Verweis aus, falls in der Konfiguration kein 'template' gesetzt ist.
+        """
+        unit_names = [
+            unit_config.get('base_unit'),
+            unit_config.get('campaign_unit'),
+        ]
+        candidate_files = [
+            self.xml_base_dir / "Units/Skirmish/SkirmishUnits_Republic.xml",
+            self.xml_base_dir / "Units/Republic_Space_Units.xml",
+        ]
+
+        for file_path in candidate_files:
+            if not file_path.exists():
+                continue
+            try:
+                tree = self.xml_processor.load_xml(str(file_path))
+            except Exception:
+                continue
+            for unit_name in unit_names:
+                if not unit_name:
+                    continue
+                element = self.xml_processor.find_unit_element(tree, unit_name)
+                if element is None:
+                    continue
+                variant_el = element.find('Variant_Of_Existing_Type')
+                if variant_el is not None and variant_el.text:
+                    variant = variant_el.text.strip()
+                    if variant.startswith('Template_'):
+                        return variant
+        return None
+
+    def _find_file_containing_hardpoints(self, ship_type: str) -> Optional[Path]:
+        """Sucht die Hardpoint-Datei, die Hardpoints für einen Schiffstyp enthält."""
+        if not ship_type:
+            return None
+        hardpoints_dir = self.xml_base_dir / "Hardpoints"
+        if not hardpoints_dir.exists():
+            return None
+        prefix = ship_type.lower()
+        for path in sorted(hardpoints_dir.glob("HardPoints_*.xml")):
+            try:
+                tree = self.xml_processor.load_xml(str(path))
+            except Exception:
+                continue
+            if self.xml_processor.find_hardpoint_elements(tree, ship_type):
+                return path
+        return None
+
     def get_ship_class(self, unit_name: str) -> str:
-        """Ermittelt die Schiffsklasse basierend auf dem Namen"""
+        """Ermittelt die Schiffsklasse basierend auf dem Namen (Fallback-Heuristik)."""
         frigate_keywords = ['acclamator', 'venator', 'victory', 'frigate']
         # Erweiterte Erkennung für Großkampfschiffe/Battlecruiser/Dreadnoughts
         capital_keywords = [
@@ -388,36 +517,59 @@ class SWModdingTool:
             'praetor', 'procurator', 'mandator', 'maelstrom',
             'battlecruiser', 'dreadnought', 'imperator'
         ]
-        
+
         unit_lower = unit_name.lower()
-        
+
         for keyword in frigate_keywords:
             if keyword in unit_lower:
                 return "Frigates"
-        
+
         for keyword in capital_keywords:
             if keyword in unit_lower:
                 return "Capitals"
-        
+
         return "Frigates"  # Standard
-    
-    def get_target_files(self, unit_name: str, game_mode: str) -> Dict[str, str]:
-        """Ermittelt die Ziel-Dateien für eine Einheit"""
+
+    def get_target_files(self, unit_name: str, game_mode: str, unit_config: Optional[Dict[str, Any]] = None) -> Dict[str, str]:
+        """Ermittelt die Ziel-Dateien für eine Einheit.
+
+        Die Template- und Hardpoint-Datei werden bevorzugt über den echten
+        Spielinhalt aufgelöst (Template-Name bzw. Hardpoint-Namen), damit auch
+        Schiffe außerhalb von Frigates/Capitals korrekt getroffen werden.
+        """
         ship_class = self.get_ship_class(unit_name)
-        
+        unit_config = unit_config or {}
+
+        template_path = None
+        template_name = unit_config.get('template') or f"Template_{unit_name}"
+        found_template_file = self._find_file_containing_template(template_name)
+        if found_template_file is not None:
+            template_path = str(found_template_file)
+        else:
+            template_path = str(self.xml_base_dir / f"Units/Templates_{ship_class}.xml")
+
+        # Hardpoint-Datei anhand des Schiffstyps (erstes Namenssegment) suchen
+        search_name = unit_name.split('_')[0]
+        hardpoint_path = None
+        found_hardpoint_file = self._find_file_containing_hardpoints(search_name)
+        if found_hardpoint_file is not None:
+            hardpoint_path = str(found_hardpoint_file)
+        else:
+            hardpoint_path = str(self.xml_base_dir / f"Hardpoints/HardPoints_Coresaga_{ship_class}.xml")
+
         files = {
-            'template': str(self.xml_base_dir / f"Units/Templates_{ship_class}.xml"),
-            'hardpoints': str(self.xml_base_dir / f"Hardpoints/HardPoints_Coresaga_{ship_class}.xml"),
+            'template': template_path,
+            'hardpoints': hardpoint_path,
             'skirmish_file': str(self.xml_base_dir / "Units/Skirmish/SkirmishUnits_Republic.xml"),
             'campaign_file': str(self.xml_base_dir / "Units/Republic_Space_Units.xml")
         }
-        
+
         # Vereinfacht - beide Dateien werden bereitgestellt, die Entscheidung wird in apply_squadron_changes getroffen
         if game_mode == "skirmish":
             files['squadrons'] = files['skirmish_file']
         else:
             files['squadrons'] = files['campaign_file']
-        
+
         return files
     
     def is_template_based_skirmish_unit(self, unit_config: Dict[str, Any]) -> bool:
@@ -502,23 +654,50 @@ class SWModdingTool:
         """Wendet Template-Änderungen an"""
         if 'template_changes' not in unit_config:
             return
-        
-        print(f"Wende Template-Änderungen an: {template_file}")
-        
-        # XML laden
-        tree = self.xml_processor.load_xml(template_file)
+
         template_name = unit_config.get('template')
-        
+
+        # Template-Namen ermitteln, falls nicht gesetzt: über Variant_Of_Existing_Type
+        if not template_name:
+            template_name = self._resolve_template_name_for_unit(unit_config)
+
         if not template_name:
             print(f"Kein Template für Einheit angegeben – versuche, Änderungen direkt auf Units anzuwenden")
             self.apply_unit_changes_fallback(unit_config)
             return
-        
+
+        # Template-Datei über den echten Spielinhalt auflösen
+        resolved_file = self._find_file_containing_template(template_name)
+        if resolved_file is not None:
+            template_file = str(resolved_file)
+
+        print(f"Wende Template-Änderungen an: {template_file}")
+
+        # XML laden
+        tree = self.xml_processor.load_xml(template_file)
+
         template_element = self.xml_processor.find_template_element(tree, template_name)
+
+        # Fallback: Falls der konfigurierte Template-Name falsch ist, den echten
+        # Template-Verweis der Unit (Variant_Of_Existing_Type) verwenden.
+        if not template_element:
+            real_name = self._resolve_template_name_for_unit(unit_config)
+            if real_name and real_name != template_name:
+                real_file = self._find_file_containing_template(real_name)
+                if real_file is not None:
+                    real_tree = self.xml_processor.load_xml(str(real_file))
+                    real_element = self.xml_processor.find_template_element(real_tree, real_name)
+                    if real_element is not None:
+                        print(f"  Hinweis: '{template_name}' nicht gefunden, verwende '{real_name}'")
+                        template_name = real_name
+                        template_file = str(real_file)
+                        tree = real_tree
+                        template_element = real_element
+
         if not template_element:
             print(f"Template nicht gefunden: {template_name}")
             return
-        
+
         # Änderungen anwenden
         changes = unit_config['template_changes']
         updated_values = {}  # Speichere aktualisierte Werte für Tooltips
@@ -557,9 +736,86 @@ class SWModdingTool:
                 self.update_tooltips_for_unit(unit_config, updated_values)
             except Exception as e:
                 print(f"Warnung: Konnte Tooltips nicht aktualisieren: {e}")
-    
 
-    
+        # WICHTIG: Manche Units definieren Eigenschaften (z.B. Population_Value) direkt
+        # auf der Campaign-/Skirmish-Unit. Dieser Wert überschreibt den Template-Wert,
+        # wodurch die Template-Änderung im Spiel unsichtbar bliebe.
+        self._apply_unit_level_overrides(unit_config, changes)
+
+    def _find_child_case_insensitive(self, element: ET.Element, tag_name: str) -> Optional[ET.Element]:
+        """Findet ein direktes Kind-Element unabhängig von Groß-/Kleinschreibung.
+
+        Die Konfiguration nutzt snake_case (population_value), die Spiel-XML aber
+        CamelCase (Population_Value). Ein direkter find() würde hier fehlschlagen.
+        """
+        target = tag_name.lower()
+        for child in element:
+            if child.tag.split('}')[-1].lower() == target:
+                return child
+        return None
+
+    def _apply_unit_level_overrides(self, unit_config: Dict[str, Any], changes: Dict[str, Any]):
+        """Aktualisiert Eigenschaften, die auf Unit-Ebene das Template überschreiben.
+
+        Hintergrund: Einige Units setzen z.B. <Population_Value> direkt auf der
+        Campaign- oder Skirmish-Unit. In Empire at War hat dieser Wert Vorrang vor
+        dem gleichnamigen Template-Wert. Wird nur das Template geändert, bleibt die
+        Änderung im Spiel daher unsichtbar (Beispiel: Imperial_Star_Destroyer
+        definiert Population_Value=35 auf der Unit, das Template aber 20).
+        """
+        campaign_unit = unit_config.get('campaign_unit')
+        skirmish_unit = unit_config.get('base_unit')
+        game_mode = self.config.get('game_mode', 'skirmish')
+
+        targets = []
+        if campaign_unit:
+            targets.append((str(self.xml_base_dir / "Units/Republic_Space_Units.xml"), campaign_unit, 'Campaign'))
+        if skirmish_unit and game_mode == 'skirmish':
+            targets.append((str(self.xml_base_dir / "Units/Skirmish/SkirmishUnits_Republic.xml"), skirmish_unit, 'Skirmish'))
+
+        for file_path, unit_name, label in targets:
+            try:
+                tree = self.xml_processor.load_xml(file_path)
+            except Exception as e:
+                print(f"  Warnung: Konnte {file_path} nicht laden: {e}")
+                continue
+
+            unit_element = self.xml_processor.find_unit_element(tree, unit_name)
+            if unit_element is None:
+                continue
+
+            modified = False
+            for property_name, change_value in changes.items():
+                # Nur Eigenschaften anfassen, die auf der Unit-Ebene wirklich existieren.
+                # Die XML-Tags sind CamelCase (z.B. Population_Value), während die
+                # Konfiguration snake_case nutzt - daher case-insensitiv suchen.
+                tag = self._find_child_case_insensitive(unit_element, property_name)
+                if tag is None or not tag.text or not tag.text.strip():
+                    continue
+
+                try:
+                    original_value = float(tag.text)
+                except ValueError:
+                    continue
+
+                if isinstance(change_value, str) and change_value.endswith('%'):
+                    new_value = self.calculate_percentage_value(original_value, change_value)
+                else:
+                    new_value = change_value
+
+                if property_name in ("shield_points", "shield_refresh_rate", "population_value"):
+                    try:
+                        new_value = int(round(float(new_value)))
+                    except Exception:
+                        pass
+
+                self.xml_processor.set_value(unit_element, property_name, new_value)
+                print(f"  ({label}-Unit-Override) {unit_name} {property_name}: {original_value} -> {new_value}")
+                modified = True
+
+            if modified:
+                self.xml_processor.save_xml(tree, file_path)
+
     def apply_squadron_changes(self, unit_config: Dict[str, Any], squadron_file: str):
         """Wendet Squadron-Änderungen an mit neuer Logik"""
         if 'squadrons' not in unit_config:
@@ -850,7 +1106,12 @@ class SWModdingTool:
 
     def apply_unit_changes_fallback(self, unit_config: Dict[str, Any]):
         """Wendet 'template_changes' ersatzweise direkt auf Campaign-/Skirmish-Units an,
-        wenn kein Template angegeben ist (z.B. bei Praetor/Procurator)."""
+        wenn kein Template angegeben ist (z.B. bei Praetor/Procurator).
+
+        Wichtig: In Skirmish-Modus müssen direkte Änderungen auch auf die Skirmish-Unit
+        angewendet werden, weil manche Units keine echte Template-Referenz haben und
+        sonst nur die Campaign-Variante modifiziert würde.
+        """
         if 'template_changes' not in unit_config:
             return
 
@@ -863,47 +1124,50 @@ class SWModdingTool:
         # Ziel-Units ermitteln
         campaign_unit_name = unit_config.get('campaign_unit')
         skirmish_unit_name = unit_config.get('base_unit')
+        game_mode = self.config.get('game_mode', 'skirmish')
 
-        # Auf Campaign anwenden
-        if campaign_unit_name:
+        def apply_file_changes(file_path: str, unit_name: str, label: str):
             try:
-                tree = self.xml_processor.load_xml(campaign_file)
-                unit_element = self.xml_processor.find_unit_element(tree, campaign_unit_name)
-                if unit_element is not None:
-                    updated_values: Dict[str, Any] = {}
-                    for property_name, change_value in changes.items():
-                        original_value = self.xml_processor.get_original_value(unit_element, property_name)
-                        if original_value is None and isinstance(change_value, str) and change_value.endswith('%'):
-                            print(f"  Warnung: Originalwert nicht gefunden für {property_name} (Campaign), Prozentänderung übersprungen")
-                            continue
-                        if isinstance(change_value, str) and change_value.endswith('%') and original_value is not None:
-                            new_value = self.calculate_percentage_value(original_value, change_value)
-                        else:
-                            new_value = change_value
-                        # Schildwerte immer auf ganze Zahlen runden
-                        if property_name in ("shield_points", "shield_refresh_rate"):
-                            try:
-                                new_value = int(round(float(new_value)))
-                            except Exception:
-                                pass
-                        self.xml_processor.set_value(unit_element, property_name, new_value)
-                        print(f"  (Campaign) {campaign_unit_name} {property_name}: {original_value} -> {new_value}")
-                        updated_values[property_name] = new_value
-                    self.xml_processor.save_xml(tree, campaign_file)
+                tree = self.xml_processor.load_xml(file_path)
+                unit_element = self.xml_processor.find_unit_element(tree, unit_name)
+                if unit_element is None:
+                    print(f"  {label}-Unit nicht gefunden: {unit_name}")
+                    return
 
-                    # Tooltips/Textdateien aktualisieren, falls relevante Werte angepasst wurden
-                    if any(k in updated_values for k in ("shield_points", "shield_refresh_rate", "tactical_health")):
+                updated_values: Dict[str, Any] = {}
+                for property_name, change_value in changes.items():
+                    original_value = self.xml_processor.get_original_value(unit_element, property_name)
+                    if original_value is None and isinstance(change_value, str) and change_value.endswith('%'):
+                        print(f"  Warnung: Originalwert nicht gefunden für {property_name} ({label}), Prozentänderung übersprungen")
+                        continue
+                    if isinstance(change_value, str) and change_value.endswith('%') and original_value is not None:
+                        new_value = self.calculate_percentage_value(original_value, change_value)
+                    else:
+                        new_value = change_value
+                    if property_name in ("shield_points", "shield_refresh_rate"):
                         try:
-                            self.update_tooltips_for_unit(unit_config, updated_values)
-                        except Exception as e:
-                            print(f"  Warnung: Konnte Tooltips nicht aktualisieren: {e}")
-                else:
-                    print(f"  Campaign-Unit nicht gefunden: {campaign_unit_name}")
-            except Exception as e:
-                print(f"  Warnung: Konnte Änderungen nicht auf Campaign-Unit anwenden: {e}")
+                            new_value = int(round(float(new_value)))
+                        except Exception:
+                            pass
+                    self.xml_processor.set_value(unit_element, property_name, new_value)
+                    print(f"  ({label}) {unit_name} {property_name}: {original_value} -> {new_value}")
+                    updated_values[property_name] = new_value
 
-        # WICHTIG: Keine direkten Änderungen auf Skirmish-Unit setzen, da Vererbung additiv ist
-        # und Skirmish-Units i.d.R. von Campaign-Units erben. Skirmish übernimmt Werte aus Campaign.
+                self.xml_processor.save_xml(tree, file_path)
+
+                if any(k in updated_values for k in ("shield_points", "shield_refresh_rate", "tactical_health")):
+                    try:
+                        self.update_tooltips_for_unit(unit_config, updated_values)
+                    except Exception as e:
+                        print(f"  Warnung: Konnte Tooltips nicht aktualisieren: {e}")
+            except Exception as e:
+                print(f"  Warnung: Konnte Änderungen nicht auf {label}-Unit anwenden: {e}")
+
+        if campaign_unit_name:
+            apply_file_changes(campaign_file, campaign_unit_name, 'Campaign')
+
+        if skirmish_unit_name and game_mode == 'skirmish':
+            apply_file_changes(skirmish_file, skirmish_unit_name, 'Skirmish')
     
     def apply_changes(self):
         """Wendet alle Änderungen aus der Konfiguration an"""
@@ -938,7 +1202,7 @@ class SWModdingTool:
             print("-" * 30)
             
             # Ziel-Dateien ermitteln
-            target_files = self.get_target_files(unit_name, game_mode)
+            target_files = self.get_target_files(unit_name, game_mode, unit_config)
             
             # Template-Änderungen
             if 'template_changes' in unit_config:
@@ -1238,8 +1502,7 @@ class SWModdingTool:
         ordered_keys: List[str] = []
 
         template_files = [
-            str(self.xml_base_dir / "Units/Templates_Frigates.xml"),
-            str(self.xml_base_dir / "Units/Templates_Capitals.xml"),
+            str(path) for path in sorted((self.xml_base_dir / "Units").glob("Templates_*.xml"))
         ]
 
         def collect(element: ET.Element) -> None:
@@ -1684,7 +1947,7 @@ class SWModdingTool:
             print("-" * 30)
             
             # Ziel-Dateien ermitteln
-            target_files = self.get_target_files(unit_name, game_mode)
+            target_files = self.get_target_files(unit_name, game_mode, unit_config)
             
             # Template-Änderungen zurücksetzen
             self.reset_template_changes(unit_config, target_files['template'])
@@ -1717,19 +1980,19 @@ class SWModdingTool:
             
         campaign_unit = unit_config.get('campaign_unit')
         if not campaign_unit:
-            print(f"⚠️  Keine Campaign-Unit angegeben für normale Markt-Freischaltung")
+            print(f"  [WARNUNG] Keine Campaign-Unit angegeben für normale Markt-Freischaltung")
             return
             
         campaign_file = str(self.xml_base_dir / "Units/Republic_Space_Units.xml")
         
-        print(f"🏪 Schalte {campaign_unit} im normalen Baumarkt frei...")
+        print(f"Schalte {campaign_unit} im normalen Baumarkt frei...")
         
         # XML laden
         tree = self.xml_processor.load_xml(campaign_file)
         unit_element = self.xml_processor.find_unit_element(tree, campaign_unit)
         
         if not unit_element:
-            print(f"⚠️  Einheit nicht gefunden: {campaign_unit}")
+            print(f"  [WARNUNG] Einheit nicht gefunden: {campaign_unit}")
             return
             
         # Build_Initially_Locked auf No setzen
@@ -1753,13 +2016,14 @@ class SWModdingTool:
             
         # Speichern
         self.xml_processor.save_xml(tree, campaign_file)
-        print(f"✅ {campaign_unit} im normalen Baumarkt freigeschaltet")
+        print(f"  {campaign_unit} im normalen Baumarkt freigeschaltet")
 
 
 def main():
     """Hauptfunktion"""
     parser = argparse.ArgumentParser(description='Star Wars Modding Automation Tool')
     parser.add_argument('--config', '-c', required=True, help='Konfigurationsdatei (YAML)')
+    parser.add_argument('--xml-root', help='Pfad zum XML-Root (z.B. C:/Games/.../Data/XML)')
     parser.add_argument('--no-backup', action='store_true', help='Keine Backups erstellen')
     parser.add_argument('--preview', action='store_true', help='Nur Vorschau, keine Änderungen')
     parser.add_argument('--reset', action='store_true', help='Setzt alle Änderungen auf Originalwerte zurück')
@@ -1769,7 +2033,7 @@ def main():
     
     try:
         # Tool initialisieren
-        tool = SWModdingTool(args.config, backup_originals=not args.no_backup)
+        tool = SWModdingTool(args.config, backup_originals=not args.no_backup, xml_root=args.xml_root)
         
         if args.preview:
             print("VORSCHAU-MODUS - Keine Änderungen werden vorgenommen")

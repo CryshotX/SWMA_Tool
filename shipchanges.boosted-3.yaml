@@ -2,7 +2,7 @@
 # yaml-language-server: $schema=./shipchanges.schema.json
 
 # SWMA Tool Konfiguration
-game_mode: campaign
+game_mode: skirmish
 
 units:
   Arquitens:
@@ -10,47 +10,81 @@ units:
     base_unit: Skirmish_Arquitens
     campaign_unit: Arquitens
     template_changes:
-      shield_refresh_rate: +0%
-      shield_points: +0%
-      energy_refresh_rate: +0%
+      shield_refresh_rate: +200%
+      shield_points: +50%
+      energy_refresh_rate: +100%
+      tactical_health: +50%
     hardpoints:
-      damage_increase: +0%
-      burst_delay_adjustment: +0%
-      fire_rate_increase: +0%
+      damage_increase: +30%
+      burst_delay_adjustment: -30%
+      fire_rate_increase: +30%
 
   Acclamator_I_Carrier:
     template: Template_Acclamator_I_Carrier
     base_unit: Skirmish_Acclamator_I_Carrier
     campaign_unit: Acclamator_I_Carrier
     template_changes:
-      shield_points: +0%
-      shield_refresh_rate: +0%
+      shield_points: +50%
+      shield_refresh_rate: +200%
+      tactical_health: +50%
+      energy_refresh_rate: +100%
     hardpoints:
-      damage_increase: +0%
+      damage_increase: +30%
+      burst_delay_adjustment: -30%
+      fire_rate_increase: +30%
     squadrons:
-      delay_seconds: 5
+      delay_seconds: 3
       starting:
         0:
           - type: Clone_ARC_170_Squadron
             count: 3
-          - type: NTB_630_Squadron
-            count: 3
+          - type: BTLB_Y_Wing_Squadron
+            count: 1
       reserve:
         0:
           - type: Clone_ARC_170_Squadron
-            count: 12
-          - type:  NTB_630_Squadron
-            count: 12
+            count: 6
+          - type: BTLB_Y_Wing_Squadron
+            count: 3
+
+  
 
   Acclamator_II:
     template: Template_Acclamator_II
     base_unit: Skirmish_Acclamator_II
     campaign_unit: Acclamator_II
     template_changes:
-      shield_points: +0%
-      energy_refresh_rate: +0%
+      shield_points: +50%
+      shield_refresh_rate: +200%
+      energy_refresh_rate: +100%
+      tactical_health: +50%
     hardpoints:
       damage_increase: +0%
+
+
+  Victory_I:
+    template: Template_Victory_I_Star_Destroyer
+    base_unit: Skirmish_Victory_I_Star_Destroyer
+    campaign_unit: Victory_I_Star_Destroyer
+    hardpoints:
+      damage_increase: +60%
+      burst_delay_adjustment: -60%
+      fire_rate_increase: +60%
+    template_changes:
+      shield_points: +50%
+      shield_refresh_rate: +200%
+      tactical_health: +50%
+      energy_refresh_rate: +100%
+    squadrons:
+      delay_seconds: 5
+      starting:
+        0:
+          - type: Clone_ARC_170_Squadron
+            count: 2
+      reserve:
+        0:
+          - type: Clone_ARC_170_Squadron
+            count: 6
 
   Venator:
     template: Template_Venator_Star_Destroyer
@@ -59,16 +93,27 @@ units:
     template_changes:
       shield_refresh_rate: +200%
       shield_points: +50%
+      tactical_health: +50%
+      energy_refresh_rate: +100%
+    hardpoints:
+      damage_increase: +30%
+      burst_delay_adjustment: -30%
+      fire_rate_increase: +30%
+    cost_changes:
+      Build_Cost_Credits: -20%
+      Tactical_Build_Cost_Multiplayer: -20%
     squadrons:
       delay_seconds: 1
       starting:
         0:
           - type: Clone_ARC_170_Squadron
-            count: 1
-          - type: Clone_Nimbus_V_Wing_Squadron
-            count: 1
-          - type: NTB_630_Squadron
             count: 2
+          - type: Clone_Nimbus_V_Wing_Squadron
+            count: 2
+          - type: NTB_630_Squadron
+            count: 1
+          - type: BTLB_Y_Wing_Squadron
+            count: 1
       reserve:
         0:
           - type: Clone_ARC_170_Squadron
@@ -76,74 +121,69 @@ units:
           - type: Clone_Nimbus_V_Wing_Squadron
             count: 8
           - type: NTB_630_Squadron
-            count: 8
+            count: 4
+          - type: BTLB_Y_Wing_Squadron
+            count: 4
 
   Tector_Star_Destroyer:
     template: Template_Tector_Star_Destroyer
     base_unit: Skirmish_Tector_Star_Destroyer
     campaign_unit: Tector_Star_Destroyer
     hardpoints:
-      fire_rate_increase: +0%
-      damage_increase: +0%
-      burst_delay_adjustment: +0%
+      damage_increase: +100%
+      burst_delay_adjustment: -90%
+      fire_rate_increase: +100%
     template_changes:
-      shield_refresh_rate: +0%
-      shield_points: +0%
-      energy_refresh_rate: +0%
+      shield_refresh_rate: +200%
+      shield_points: +50%
+      energy_refresh_rate: +100%
+      tactical_health: +50%
+      population_value: 25
     cost_changes:
       Tactical_Build_Cost_Multiplayer: +0%
     squadrons:
-      delay_seconds: 10
+      delay_seconds: 3
       starting:
         0:
           - type: Clone_ARC_170_Squadron
-            count: 1
+            count: 4
       reserve:
         0:
           - type: Clone_ARC_170_Squadron
-            count: 3
+            count: 12
 
   Imperial_Star_Destroyer:
     template: Template_Imperator_Star_Destroyer
     base_unit: Skirmish_Imperator_Star_Destroyer
     campaign_unit: Imperator_Star_Destroyer
     template_changes:
-      population_value: 10
-    squadrons:
-      delay_seconds: 4
-      starting:
-        0:
-          - type: Clone_ARC_170_Squadron
-            count: 1
-          - type: Clone_Nimbus_V_Wing_Squadron
-            count: 1
-      reserve:
-        0:
-          - type: Clone_ARC_170_Squadron
-            count: 6
-          - type: Clone_Nimbus_V_Wing_Squadron
-            count: 9
-
-  Victory_I:
-    template: Template_Victory_I_Star_Destroyer
-    base_unit: Skirmish_Victory_I_Star_Destroyer
-    campaign_unit: Victory_I_Star_Destroyer
+      population_value: 25
+      shield_points: +50%
+      shield_refresh_rate: +200%
+      energy_refresh_rate: +100%
+      tactical_health: +50%
     hardpoints:
-      fire_rate_increase: +0%
-      burst_delay_adjustment: +0%
-    template_changes:
-      shield_points: +100%
-      shield_refresh_rate: +250%
+      damage_increase: +30%
+      burst_delay_adjustment: -30%
+      fire_rate_increase: +30%
     squadrons:
-      delay_seconds: 15
+      delay_seconds: 2
       starting:
         0:
           - type: Clone_ARC_170_Squadron
-            count: 1
+            count: 4
+          - type: Clone_Nimbus_V_Wing_Squadron
+            count: 2
+          - type: BTLB_Y_Wing_Squadron
+            count: 2
       reserve:
         0:
           - type: Clone_ARC_170_Squadron
-            count: 3
+            count: 12
+          - type: Clone_Nimbus_V_Wing_Squadron
+            count: 6
+          - type: BTLB_Y_Wing_Squadron
+            count: 6
 
   Secutor:
     template: Template_Secutor_Star_Destroyer
@@ -151,27 +191,36 @@ units:
     campaign_unit: Secutor_Star_Destroyer
     template_changes:
       shield_refresh_rate: +200%
-      population_value: 10
+      shield_points: +50%
+      tactical_health: +50%
+      energy_refresh_rate: +100%
+      population_value: 25
     squadrons:
-      delay_seconds: 2
+      delay_seconds: 1
       starting:
-        0:
-          - type: Clone_ARC_170_Squadron
-            count: 1
-          - type: Clone_Nimbus_V_Wing_Squadron
-            count: 2
-          - type: NTB_630_Squadron
-            count: 3
-      reserve:
         0:
           - type: Clone_ARC_170_Squadron
             count: 4
           - type: Clone_Nimbus_V_Wing_Squadron
-            count: 8
+            count: 4
           - type: NTB_630_Squadron
-            count: 12
+            count: 2
+          - type: BTLB_Y_Wing_Squadron
+            count: 2
+      reserve:
+        0:
+          - type: Clone_ARC_170_Squadron
+            count: 20
+          - type: Clone_Nimbus_V_Wing_Squadron
+            count: 20
+          - type: NTB_630_Squadron
+            count: 10
+          - type: NTB_630_Squadron
+            count: 10
     hardpoints:
-      damage_increase: +0%
+      damage_increase: +30%
+      burst_delay_adjustment: -30%
+      fire_rate_increase: +30%
   
   Maelstrom_Battlecruiser:
     template: Template_Maelstrom_Battlecruiser
@@ -179,9 +228,10 @@ units:
     campaign_unit: Maelstrom_Battlecruiser
     unlock_normal_market: true  # Schaltet im normalen Baumarkt frei
     template_changes:
-      shield_refresh_rate: +100%
+      shield_refresh_rate: +200%
       shield_points: +50%
       energy_refresh_rate: +100%
+      tactical_health: +50%
       population_value: 15
     hardpoints:
       damage_increase: +100%
@@ -212,8 +262,14 @@ units:
     unlock_normal_market: true  # Schaltet im normalen Baumarkt frei
     template_changes:
       shield_refresh_rate: +200%
+      shield_points: +50%
       energy_refresh_rate: +100%
-      population_value: 20
+      tactical_health: +50%
+      population_value: 40
+    hardpoints:
+      damage_increase: +100%
+      burst_delay_adjustment: -90%
+      fire_rate_increase: +100%
     squadrons:
       delay_seconds: 5
       starting:
@@ -222,25 +278,22 @@ units:
             count: 3
           - type: Clone_Nimbus_V_Wing_Squadron
             count: 3
-          - type: NTB_630_Squadron
-            count: 2
       reserve:
         0:
           - type: Clone_ARC_170_Squadron
             count: 12
           - type: Clone_Nimbus_V_Wing_Squadron
             count: 12
-          - type: NTB_630_Squadron
-            count: 5
 
   Procurator_Battlecruiser:
     base_unit: Skirmish_Procurator_Battlecruiser
     campaign_unit: Procurator_Battlecruiser
     unlock_normal_market: true  # Schaltet im normalen Baumarkt frei
     template_changes:
-      shield_refresh_rate: +180%
-      shield_points: +80%
-      energy_refresh_rate: +200%
+      shield_refresh_rate: +200%
+      shield_points: +50%
+      energy_refresh_rate: +100%
+      tactical_health: +50%
       population_value: 18
     squadrons:
       delay_seconds: 5
@@ -265,8 +318,10 @@ units:
     base_unit: Skirmish_Acclamator_Destroyer
     campaign_unit: Acclamator_Destroyer
     template_changes:
-      shield_refresh_rate: +50%
-      energy_refresh_rate: +15%
+      shield_refresh_rate: +200%
+      shield_points: +50%
+      energy_refresh_rate: +100%
+      tactical_health: +50%
       population_value: 12
     squadrons:
       delay_seconds: 4
@@ -292,7 +347,9 @@ units:
     unlock_normal_market: true  # Schaltet im normalen Baumarkt frei
     template_changes:
       shield_refresh_rate: +200%
+      shield_points: +50%
       energy_refresh_rate: +100%
+      tactical_health: +50%
       population_value: 25
     squadrons:
       delay_seconds: 3
